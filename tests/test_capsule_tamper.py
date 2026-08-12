@@ -128,7 +128,7 @@ def _duplicate_manifest_key(root: Path) -> None:
 
 def _unsafe_manifest_path(value: str) -> Callable[[Path], None]:
     def mutate(root: Path) -> None:
-        path = root / "CAPSULE_MANIFUST.json"
+        path = root / "CAPSULE_MANIFEST.json"
         document = json.loads(path.read_text(encoding="utf-8"))
         document["files"][value] = {
             "kind": "documentation",
