@@ -9,6 +9,24 @@
 - three focused subprocess and tamper test files;
 - explicit licence and authorised-input blockers.
 
+## Intended users
+
+- paper reviewers and technical readers verifying the released claims;
+- dynamic-endoscopy researchers inspecting the measurement and comparison logic;
+- challenge organisers evaluating a future score-admission policy;
+- project maintainers reviewing provenance, licences, and release scope.
+
+Clinical readers are primarily served by the paper and workshop presentation rather than the source tree.
+
+## Test budget
+
+- exactly three test files;
+- five top-level test methods in the current Phase 0;
+- one standard-library test command;
+- new scientific coverage extends an existing test file;
+- new integrity failures become parameterised cases in the existing tamper test;
+- no coverage threshold, mutation framework, hosted CI policy, gate registry, or proof plane.
+
 ## Required before a public capsule
 
 - consume the final #103 allowlist, conformance vectors and independent oracle;

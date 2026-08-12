@@ -128,7 +128,7 @@ def _duplicate_manifest_key(root: Path) -> None:
 
 def _unsafe_manifest_path(value: str) -> Callable[[Path], None]:
     def mutate(root: Path) -> None:
-        path = root / "CAPSULE_MANIFEST.json"
+        path = root / "CAPSULE_MANIFUST.json"
         document = json.loads(path.read_text(encoding="utf-8"))
         document["files"][value] = {
             "kind": "documentation",
@@ -202,14 +202,7 @@ class CapsuleTamperTests(unittest.TestCase):
             "source-ref-disagreement": _disagree_source_ref,
             "duplicate-manifest-key": _duplicate_manifest_key,
         }
-        for name, mutate in cases.items():
-            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
-                root = _copy_capsule(Path(directory))
-                mutate(root)
-                self._assert_fails_closed(root)
-
-    def test_unsafe_manifest_paths_fail_closed(self) -> None:
-        paths = (
+        unsafe_paths = (
             r"..\outside",
             r"C:\outside",
             r"\\server\share\outside",
@@ -217,10 +210,16 @@ class CapsuleTamperTests(unittest.TestCase):
             "/absolute/outside",
             "a//outside",
         )
-        for value in paths:
-            with self.subTest(path=value), tempfile.TemporaryDirectory() as directory:
+        cases.update(
+            {
+                f"unsafe-manifest-path-{index}": _unsafe_manifest_path(value)
+                for index, value in enumerate(unsafe_paths, start=1)
+            }
+        )
+        for name, mutate in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
                 root = _copy_capsule(Path(directory))
-                _unsafe_manifest_path(value)(root)
+                mutate(root)
                 self._assert_fails_closed(root)
 
     def test_unchecked_bytecode_is_rejected_before_import(self) -> None:

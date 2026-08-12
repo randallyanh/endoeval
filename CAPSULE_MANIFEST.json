@@ -44,8 +44,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "21f1e69bb03e89dd6ce9682162004b401b3812dc8066fd72372d16950d207bb5",
-      "size": 3056
+      "sha256": "71fd635c791b8956ed5895576b84d9bc3bf201ca3c7ce466d3a492156d480a98",
+      "size": 5253
     },
     "RELEASE_SCOPE.md": {
       "kind": "policy",
@@ -53,8 +53,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "a35c7cc2bfc518a39a10a7e0053ebd47ce12c490ef1cce3b05ecfd6888caa654",
-      "size": 1332
+      "sha256": "69f81970fc92d15af4729d7c5beb2a1bbab5f516b4803a74bc93e4daeefb2177",
+      "size": 2119
     },
     "SOURCE_REFS.json": {
       "kind": "provenance",
@@ -190,8 +190,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "702920c1a69506dcee9189bcb9dae49da158ae0a8c63112351af411a74964869",
-      "size": 7840
+      "sha256": "4040a7456ee93eaed668d2245e7d1c732e47532ae0ceb6366a089dd869019a8c",
+      "size": 7723
     },
     "tests/test_capsule_verify.py": {
       "kind": "test",
