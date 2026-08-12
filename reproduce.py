@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify the private Paper 3 reproducibility-capsule staging repository.
 
-Level A is intentionally dependency-free. It closes the managed file set,
+Level A is intentionally dependency-free. It closes the managed source surface,
 checks imported scientific-source identities, exercises the numerical and
 claim-admission kernel, and validates frozen record-level headlines. Level B
 raw replay remains blocked until the final #103/#115 boundaries, authorised
@@ -15,12 +15,16 @@ import hashlib
 import json
 import math
 import os
+import stat
 import sys
 from dataclasses import replace
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
+sys.dont_write_bytecode = True
+
 ROOT = Path(__file__).resolve().parent
+ROOT_RESOLVED = ROOT.resolve()
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
@@ -30,45 +34,57 @@ SOURCE_REFS = ROOT / "SOURCE_REFS.json"
 HEADLINES = ROOT / "records" / "HEADLINES.json"
 LITERATURE_RESULT = ROOT / "records" / "paper3_literature_audit_result.json"
 
-_IGNORED_PARTS = frozenset(
+_ENVIRONMENT_DIRS = frozenset(
     {
         ".git",
         ".mypy_cache",
         ".pytest_cache",
         ".ruff_cache",
         ".venv",
-        "__pycache__",
         "build",
         "dist",
     }
 )
 _IGNORED_NAMES = frozenset({".DS_Store"})
-_REQUIRED_MANAGED_PATHS = frozenset(
+_FORBIDDEN_CACHE_DIRS = frozenset({"__pycache__"})
+_FORBIDDEN_CACHE_SUFFIXES = frozenset({".pyc", ".pyo"})
+_AUTHORED_ORIGIN = {"type": "authored_private_staging"}
+_SOURCE_ORIGIN_KEYS = frozenset(
     {
-        ".gitattributes",
-        ".gitignore",
-        "INTERNAL_STAGING.md",
-        "LICENSE_PENDING.md",
-        "README.md",
-        "RELEASE_SCOPE.md",
-        "SOURCE_REFS.json",
-        "THIRD_PARTY_NOTICES_DRAFT.md",
-        "data/ACQUISITION.md",
-        "data/expected_inputs.json",
-        "pyproject.toml",
-        "records/HEADLINES.json",
-        "records/paper3_literature_audit_result.json",
-        "reproduce.py",
-        "src/benchmark_integrity/__init__.py",
-        "src/benchmark_integrity/comparability.py",
-        "src/benchmark_integrity/metric_conventions.py",
-        "src/benchmark_integrity/region_error.py",
-        "tests/test_capsule_tamper.py",
-        "tests/test_capsule_verify.py",
-        "tests/test_kernel_smoke.py",
-        "uv.lock",
+        "git_blob_sha1",
+        "source_path",
+        "source_ref",
+        "source_repository",
+        "source_sha256",
+        "transformation",
     }
 )
+_SNAPSHOT_KINDS = frozenset({"source_snapshot", "record_snapshot"})
+_EXPECTED_MANAGED_FILES: dict[str, tuple[str, str]] = {
+    ".gitattributes": ("packaging", "100644"),
+    ".gitignore": ("packaging", "100644"),
+    "INTERNAL_STAGING.md": ("policy", "100644"),
+    "LICENSE_PENDING.md": ("policy", "100644"),
+    "README.md": ("documentation", "100644"),
+    "RELEASE_SCOPE.md": ("policy", "100644"),
+    "SOURCE_REFS.json": ("provenance", "100644"),
+    "THIRD_PARTY_NOTICES_DRAFT.md": ("policy", "100644"),
+    "data/ACQUISITION.md": ("policy", "100644"),
+    "data/expected_inputs.json": ("policy", "100644"),
+    "pyproject.toml": ("packaging", "100644"),
+    "records/HEADLINES.json": ("verification_policy", "100644"),
+    "records/paper3_literature_audit_result.json": ("record_snapshot", "100644"),
+    "reproduce.py": ("verifier", "100755"),
+    "src/benchmark_integrity/__init__.py": ("staging_support", "100644"),
+    "src/benchmark_integrity/comparability.py": ("source_snapshot", "100644"),
+    "src/benchmark_integrity/metric_conventions.py": ("source_snapshot", "100644"),
+    "src/benchmark_integrity/region_error.py": ("source_snapshot", "100644"),
+    "tests/test_capsule_tamper.py": ("test", "100644"),
+    "tests/test_capsule_verify.py": ("test", "100644"),
+    "tests/test_kernel_smoke.py": ("test", "100644"),
+    "uv.lock": ("packaging", "100644"),
+}
+_REQUIRED_MANAGED_PATHS = frozenset(_EXPECTED_MANAGED_FILES)
 
 _EXPECTED_HEADLINE_CHECKS: tuple[dict[str, Any], ...] = (
     {
@@ -129,21 +145,70 @@ def git_blob_sha1_bytes(payload: bytes) -> str:
     return hashlib.sha1(f"blob {len(payload)}\0".encode() + payload).hexdigest()
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    document: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in document:
+            raise ValueError(f"duplicate JSON key: {key!r}")
+        document[key] = value
+    return document
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON constant is forbidden: {value}")
+
+
 def _load(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_keys,
+        parse_constant=_reject_json_constant,
+    )
 
 
-def _safe_relative_path(value: object, *, field: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise ValueError(f"{field} must be a non-empty string")
-    pure = PurePosixPath(value)
-    if pure.is_absolute() or ".." in pure.parts or str(pure) != value:
-        raise ValueError(f"{field} is not a canonical safe relative path: {value!r}")
+def _require_hex_digest(value: object, *, field: str, length: int) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != length
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
+        raise ValueError(f"{field} must be a lowercase {length}-character hex digest")
     return value
 
 
-def _is_generated(relative: PurePosixPath) -> bool:
-    return bool(_IGNORED_PARTS.intersection(relative.parts)) or relative.name in _IGNORED_NAMES or relative.suffix in {".pyc", ".pyo"}
+def _safe_posix_relative_path(value: object, *, field: str) -> PurePosixPath:
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{field} must be a non-empty string")
+    if "\0" in value or "\\" in value:
+        raise ValueError(f"{field} is not a canonical POSIX relative path: {value!r}")
+    parts = value.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
+        raise ValueError(f"{field} contains an empty, dot, or parent component: {value!r}")
+    posix = PurePosixPath(value)
+    windows = PureWindowsPath(value)
+    if (
+        posix.is_absolute()
+        or windows.is_absolute()
+        or bool(windows.drive)
+        or posix.as_posix() != value
+    ):
+        raise ValueError(f"{field} is not a canonical safe relative path: {value!r}")
+    return posix
+
+
+def _safe_relative_path(value: object, *, field: str) -> str:
+    posix = _safe_posix_relative_path(value, field=field)
+    candidate = ROOT.joinpath(*posix.parts).resolve(strict=False)
+    try:
+        candidate.relative_to(ROOT_RESOLVED)
+    except ValueError as exc:
+        raise ValueError(f"{field} escapes the capsule root: {value!r}") from exc
+    return posix.as_posix()
+
+
+def _managed_file(path: str) -> Path:
+    posix = _safe_posix_relative_path(path, field="managed path")
+    return ROOT.joinpath(*posix.parts)
 
 
 def _enumerate_managed_tree() -> set[str]:
@@ -157,7 +222,9 @@ def _enumerate_managed_tree() -> set[str]:
             rel = PurePosixPath((relative_base / name).as_posix())
             if candidate.is_symlink():
                 raise ValueError(f"symlink directory is forbidden: {rel}")
-            if not _is_generated(rel):
+            if name in _FORBIDDEN_CACHE_DIRS:
+                raise ValueError(f"source bytecode cache is forbidden: {rel}")
+            if name not in _ENVIRONMENT_DIRS:
                 kept_dirs.append(name)
         dirnames[:] = kept_dirs
         for name in filenames:
@@ -165,13 +232,86 @@ def _enumerate_managed_tree() -> set[str]:
             rel = PurePosixPath((relative_base / name).as_posix())
             if candidate.is_symlink():
                 raise ValueError(f"symlink file is forbidden: {rel}")
-            if not _is_generated(rel):
-                actual.add(rel.as_posix())
+            if rel.parts and rel.parts[0] == ".git":
+                continue
+            if rel.name in _IGNORED_NAMES:
+                continue
+            if rel.suffix in _FORBIDDEN_CACHE_SUFFIXES:
+                raise ValueError(f"source bytecode file is forbidden: {rel}")
+            actual.add(rel.as_posix())
     return actual
 
 
-def verify_manifest() -> dict[str, Any]:
+def _validate_source_origin(origin: object, *, field: str) -> dict[str, Any]:
+    if not isinstance(origin, dict) or set(origin) != _SOURCE_ORIGIN_KEYS:
+        raise ValueError(f"{field} must contain the exact source-origin fields")
+    if origin.get("transformation") != "none":
+        raise ValueError(f"{field}.transformation must be 'none' in Phase 0")
+    repository = origin.get("source_repository")
+    if repository != "randallyanh/GP4DGS":
+        raise ValueError(f"{field}.source_repository is unexpected: {repository!r}")
+    _safe_posix_relative_path(origin.get("source_path"), field=f"{field}.source_path")
+    _require_hex_digest(origin.get("source_ref"), field=f"{field}.source_ref", length=40)
+    _require_hex_digest(
+        origin.get("git_blob_sha1"),
+        field=f"{field}.git_blob_sha1",
+        length=40,
+    )
+    _require_hex_digest(
+        origin.get("source_sha256"),
+        field=f"{field}.source_sha256",
+        length=64,
+    )
+    return origin
+
+
+def _validate_manifest_entry(path: str, entry: object) -> None:
+    expected_kind, expected_mode = _EXPECTED_MANAGED_FILES[path]
+    if not isinstance(entry, dict):
+        raise ValueError(f"manifest entry must be an object: {path}")
+    required_keys = {"kind", "mode", "origin", "sha256", "size"}
+    if set(entry) != required_keys:
+        raise ValueError(f"{path}: manifest entry keys must be {sorted(required_keys)}")
+    if entry.get("kind") != expected_kind:
+        raise ValueError(f"{path}: kind must be {expected_kind!r}")
+    if entry.get("mode") != expected_mode:
+        raise ValueError(f"{path}: mode must be {expected_mode!r}")
+    _require_hex_digest(entry.get("sha256"), field=f"{path}.sha256", length=64)
+    size = entry.get("size")
+    if not isinstance(size, int) or isinstance(size, bool) or size < 0:
+        raise ValueError(f"{path}: size must be a non-negative integer")
+    if expected_kind in _SNAPSHOT_KINDS:
+        _validate_source_origin(entry.get("origin"), field=f"{path}.origin")
+    elif entry.get("origin") != _AUTHORED_ORIGIN:
+        raise ValueError(f"{path}: authored files require the private-staging origin")
+
+
+def _verify_posix_mode(path: str, expected_mode: str) -> bool:
+    if os.name != "posix":
+        return False
+    permissions = stat.S_IMODE(_managed_file(path).stat().st_mode)
+    expected_permissions = int(expected_mode[-3:], 8)
+    if permissions != expected_permissions:
+        raise ValueError(
+            f"{path}: mode mismatch: expected {expected_mode}, got 100{permissions:03o}"
+        )
+    return True
+
+
+def _validated_manifest() -> tuple[dict[str, Any], dict[str, Any]]:
     document = _load(MANIFEST)
+    if not isinstance(document, dict):
+        raise ValueError("CAPSULE_MANIFEST.json must contain an object")
+    expected_top_level = {
+        "artifact",
+        "external_anchor",
+        "files",
+        "schema_version",
+        "self_path",
+        "status",
+    }
+    if set(document) != expected_top_level:
+        raise ValueError("CAPSULE_MANIFEST.json has unexpected top-level fields")
     if document.get("artifact") != "paper3_private_capsule_manifest":
         raise ValueError("CAPSULE_MANIFEST.json has an unexpected artifact type")
     if document.get("schema_version") != 1:
@@ -180,79 +320,117 @@ def verify_manifest() -> dict[str, Any]:
         raise ValueError("CAPSULE_MANIFEST.json status must remain private_staging_not_release")
     if document.get("self_path") != "CAPSULE_MANIFEST.json":
         raise ValueError("manifest self_path must be CAPSULE_MANIFEST.json")
-    files = document.get("files")
-    if not isinstance(files, dict) or not files:
-        raise ValueError("manifest files must be a non-empty object")
+    if document.get("external_anchor") != "the exact Git commit containing this manifest":
+        raise ValueError("manifest external_anchor moved")
 
-    declared: set[str] = set()
+    files = document.get("files")
+    if not isinstance(files, dict):
+        raise ValueError("manifest files must be an object")
+    declared = frozenset(
+        _safe_relative_path(raw_path, field="manifest path") for raw_path in files
+    )
+    if declared != _REQUIRED_MANAGED_PATHS:
+        extra = sorted(declared - _REQUIRED_MANAGED_PATHS)
+        missing = sorted(_REQUIRED_MANAGED_PATHS - declared)
+        raise ValueError(f"manifest allowlist mismatch: extra={extra}, missing={missing}")
+
     verified: dict[str, dict[str, Any]] = {}
-    for raw_path, entry in files.items():
-        path = _safe_relative_path(raw_path, field="manifest path")
-        if path == "CAPSULE_MANIFEST.json":
-            raise ValueError("the manifest must not list itself in files")
-        if path in declared:
-            raise ValueError(f"duplicate manifest path: {path}")
-        declared.add(path)
-        if not isinstance(entry, dict):
-            raise ValueError(f"manifest entry must be an object: {path}")
-        expected_sha = entry.get("sha256")
-        expected_size = entry.get("size")
-        if not isinstance(expected_sha, str) or len(expected_sha) != 64:
-            raise ValueError(f"invalid SHA-256 for {path}")
-        if not isinstance(expected_size, int) or isinstance(expected_size, bool) or expected_size < 0:
-            raise ValueError(f"invalid size for {path}")
-        file_path = ROOT / path
+    modes_verified = True
+    for path in sorted(declared):
+        entry = files[path]
+        _validate_manifest_entry(path, entry)
+        file_path = _managed_file(path)
         if not file_path.is_file() or file_path.is_symlink():
             raise ValueError(f"declared regular file is missing or unsafe: {path}")
         payload = file_path.read_bytes()
         actual_sha = sha256_bytes(payload)
-        if len(payload) != expected_size or actual_sha != expected_sha:
+        if len(payload) != entry["size"] or actual_sha != entry["sha256"]:
             raise ValueError(
-                f"{path}: identity mismatch: expected {expected_size} bytes/{expected_sha}, "
-                f"got {len(payload)} bytes/{actual_sha}"
+                f"{path}: identity mismatch: expected {entry['size']} bytes/"
+                f"{entry['sha256']}, got {len(payload)} bytes/{actual_sha}"
             )
+        modes_verified = _verify_posix_mode(path, entry["mode"]) and modes_verified
         verified[path] = {"sha256": actual_sha, "size": len(payload)}
 
-    if not _REQUIRED_MANAGED_PATHS.issubset(declared):
-        missing_required = sorted(_REQUIRED_MANAGED_PATHS - declared)
-        raise ValueError(f"manifest omits required managed files: {missing_required}")
-
     actual = _enumerate_managed_tree()
-    expected = declared | {"CAPSULE_MANIFEST.json"}
+    expected = set(declared) | {"CAPSULE_MANIFEST.json"}
     if actual != expected:
         extra = sorted(actual - expected)
         missing = sorted(expected - actual)
         raise ValueError(f"closed-tree mismatch: extra={extra}, missing={missing}")
 
-    return {
+    return document, {
         "managed_files": len(declared),
         "manifest_sha256": sha256_bytes(MANIFEST.read_bytes()),
+        "modes_verified_on_posix": modes_verified,
         "verified": verified,
     }
 
 
-def verify_source_refs() -> dict[str, Any]:
+def verify_manifest() -> dict[str, Any]:
+    return _validated_manifest()[1]
+
+
+def verify_source_refs(manifest: dict[str, Any] | None = None) -> dict[str, Any]:
+    if manifest is None:
+        manifest = _validated_manifest()[0]
     refs = _load(SOURCE_REFS)
-    if refs.get("artifact") != "paper3_private_capsule_source_refs" or refs.get("schema_version") != 2:
+    expected_top_level = {
+        "artifact",
+        "materialised_files",
+        "planned_not_materialised",
+        "release_blockers",
+        "schema_version",
+        "source_repository",
+        "status",
+    }
+    if not isinstance(refs, dict) or set(refs) != expected_top_level:
+        raise ValueError("SOURCE_REFS.json has unexpected top-level fields")
+    if (
+        refs.get("artifact") != "paper3_private_capsule_source_refs"
+        or refs.get("schema_version") != 2
+    ):
         raise ValueError("SOURCE_REFS.json has an unsupported identity")
     if refs.get("status") != "private_staging_not_release":
         raise ValueError("SOURCE_REFS.json status must remain private_staging_not_release")
+    if refs.get("source_repository") != "randallyanh/GP4DGS":
+        raise ValueError("SOURCE_REFS.json source_repository moved")
+    if not isinstance(refs.get("planned_not_materialised"), list) or not isinstance(
+        refs.get("release_blockers"), list
+    ):
+        raise ValueError("SOURCE_REFS.json blocker lists must remain arrays")
+
     materialised = refs.get("materialised_files")
-    if not isinstance(materialised, dict) or not materialised:
-        raise ValueError("SOURCE_REFS.json materialised_files must be non-empty")
+    if not isinstance(materialised, dict):
+        raise ValueError("SOURCE_REFS.json materialised_files must be an object")
+    source_manifest_entries = {
+        path: entry["origin"]
+        for path, entry in manifest["files"].items()
+        if entry["kind"] in _SNAPSHOT_KINDS
+    }
+    materialised_paths = frozenset(
+        _safe_relative_path(path, field="source-ref path") for path in materialised
+    )
+    if materialised_paths != frozenset(source_manifest_entries):
+        extra = sorted(materialised_paths - frozenset(source_manifest_entries))
+        missing = sorted(frozenset(source_manifest_entries) - materialised_paths)
+        raise ValueError(f"source-ref coverage mismatch: extra={extra}, missing={missing}")
 
     verified: dict[str, dict[str, str]] = {}
-    for raw_path, record in materialised.items():
-        path = _safe_relative_path(raw_path, field="source-ref path")
-        if not isinstance(record, dict) or record.get("transformation") != "none":
-            raise ValueError(f"{path}: only unmodified source snapshots are admitted in Phase 0")
-        for name in ("source_repository", "source_path", "source_ref"):
-            if not isinstance(record.get(name), str) or not record[name]:
-                raise ValueError(f"{path}: missing {name}")
-        payload = (ROOT / path).read_bytes()
+    for path in sorted(materialised_paths):
+        record = _validate_source_origin(
+            materialised[path],
+            field=f"SOURCE_REFS.json[{path!r}]",
+        )
+        if record != source_manifest_entries[path]:
+            raise ValueError(f"{path}: manifest origin and SOURCE_REFS.json disagree")
+        payload = _managed_file(path).read_bytes()
         actual_git = git_blob_sha1_bytes(payload)
         actual_sha = sha256_bytes(payload)
-        if actual_git != record.get("git_blob_sha1") or actual_sha != record.get("source_sha256"):
+        if (
+            actual_git != record["git_blob_sha1"]
+            or actual_sha != record["source_sha256"]
+        ):
             raise ValueError(f"{path}: local bytes no longer match frozen source metadata")
         verified[path] = {
             "git_blob_sha1": actual_git,
@@ -262,8 +440,8 @@ def verify_source_refs() -> dict[str, Any]:
     return {
         "verified": verified,
         "scope": (
-            "local bytes match frozen source metadata; the repository commit is the external "
-            "anchor for the export receipt and manifest"
+            "local bytes match the commit-anchored manifest and frozen source metadata; "
+            "the private exporter must independently read the named Git objects"
         ),
     }
 
@@ -298,12 +476,22 @@ def verify_kernel() -> dict[str, Any]:
     denominator = compare_psnr_denominators(stats, convention=FINITE_PSNR_CONVENTION)
     if denominator.status != "complete" or denominator.keep_minus_true_db is None:
         raise ValueError(f"synthetic denominator comparison did not close: {denominator.status}")
-    if not math.isclose(denominator.keep_minus_true_db, 3.010299913210364, abs_tol=1e-12):
+    if not math.isclose(
+        denominator.keep_minus_true_db,
+        3.010299913210364,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    ):
         raise ValueError(f"unexpected keep-minus-true gap: {denominator.keep_minus_true_db}")
-    pooled = aggregate_region_errors([stats, stats], reduction="pooled", convention=FINITE_PSNR_CONVENTION)
+    pooled = aggregate_region_errors(
+        [stats, stats],
+        reduction="pooled",
+        convention=FINITE_PSNR_CONVENTION,
+    )
     if pooled.status != "complete" or not math.isclose(
         pooled.keep_minus_true_db or math.nan,
         denominator.keep_minus_true_db,
+        rel_tol=0.0,
         abs_tol=1e-12,
     ):
         raise ValueError("pooled sufficient-statistics reduction drifted")
@@ -324,16 +512,20 @@ def verify_kernel() -> dict[str, Any]:
         "ordering": assess_comparability(claim_mode="ordering", facts=common),
         "capability": assess_comparability(claim_mode="capability", facts=common),
         "target_mismatch": assess_comparability(
-            claim_mode="ordering", facts=replace(common, output_target_equal=False)
+            claim_mode="ordering",
+            facts=replace(common, output_target_equal=False),
         ),
         "unknown": assess_comparability(
-            claim_mode="ordering", facts=replace(common, source_measurement_determined=False)
+            claim_mode="ordering",
+            facts=replace(common, source_measurement_determined=False),
         ),
         "rerun": assess_comparability(
-            claim_mode="ordering", facts=replace(common, frame_population_equal=False)
+            claim_mode="ordering",
+            facts=replace(common, frame_population_equal=False),
         ),
         "rescore": assess_comparability(
-            claim_mode="ordering", facts=replace(common, mask_support_equal=False)
+            claim_mode="ordering",
+            facts=replace(common, mask_support_equal=False),
         ),
     }
     expected = {
@@ -369,7 +561,11 @@ def verify_kernel() -> dict[str, Any]:
         infinity_capped=False,
     )
     transported = {
-        mode: assess_comparability(claim_mode=mode, facts=transport_facts, transport=transport).disposition
+        mode: assess_comparability(
+            claim_mode=mode,
+            facts=transport_facts,
+            transport=transport,
+        ).disposition
         for mode in ("scalar", "ordering", "capability")
     }
     if transported != {
@@ -400,7 +596,11 @@ def verify_headlines() -> dict[str, Any]:
     policy = _load(HEADLINES)
     if policy.get("artifact") != "paper3_private_capsule_expected_headlines":
         raise ValueError("HEADLINES.json has an unexpected artifact")
-    if policy.get("schema_version") != 1 or policy.get("source_record") != "records/paper3_literature_audit_result.json":
+    if (
+        policy.get("schema_version") != 1
+        or policy.get("source_record")
+        != "records/paper3_literature_audit_result.json"
+    ):
         raise ValueError("HEADLINES.json schema or source record moved")
     if policy.get("checks") != list(_EXPECTED_HEADLINE_CHECKS):
         raise ValueError("HEADLINES.json checks do not match the frozen Phase-0 policy")
@@ -420,13 +620,13 @@ def verify_headlines() -> dict[str, Any]:
 
 
 def verify() -> dict[str, Any]:
-    manifest = verify_manifest()
-    source_refs = verify_source_refs()
+    manifest_document, manifest_report = _validated_manifest()
+    source_refs = verify_source_refs(manifest_document)
     return {
         "artifact": "paper3_private_capsule_verification",
         "status": "pass",
         "level": "A-private-phase0",
-        "manifest": manifest,
+        "manifest": manifest_report,
         "source_refs": source_refs,
         "kernel": verify_kernel(),
         "literature_headlines": verify_headlines(),
@@ -435,6 +635,7 @@ def verify() -> dict[str, Any]:
             "official #103 conformance vectors and independent oracle are not yet materialised",
             "the Level-B raw-image replay path is not yet wired",
             "record checks do not independently repeat literature searches",
+            "the Python interpreter and virtual environment are outside the managed source surface",
             "no public licence or redistribution grant is asserted",
         ],
     }

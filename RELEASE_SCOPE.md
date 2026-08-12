@@ -2,11 +2,11 @@
 
 ## Included in this private Phase 0
 
-- exact snapshots of four dependency-light scientific-kernel files;
+- three exact dependency-light scientific-source snapshots plus one minimal package initializer;
 - one final Paper 3 literature-audit result authority;
 - exact source-ref, Git-blob, and source-SHA-256 metadata;
-- one closed-tree manifest and standard-library Level-A verifier;
-- three focused subprocess and tamper tests;
+- one exact managed-file allowlist and standard-library Level-A verifier;
+- three focused subprocess and tamper test files;
 - explicit licence and authorised-input blockers.
 
 ## Required before a public capsule

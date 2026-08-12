@@ -44,8 +44,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "b21c7c17f6277de60e0da5902c980cc3514312617f989840d808ed783c190a68",
-      "size": 2348
+      "sha256": "21f1e69bb03e89dd6ce9682162004b401b3812dc8066fd72372d16950d207bb5",
+      "size": 3056
     },
     "RELEASE_SCOPE.md": {
       "kind": "policy",
@@ -53,8 +53,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "19346a29ef9cccef5a6c28fb058859cc9c28db6e65886215581fec9a169b0cec",
-      "size": 1290
+      "sha256": "a35c7cc2bfc518a39a10a7e0053ebd47ce12c490ef1cce3b05ecfd6888caa654",
+      "size": 1332
     },
     "SOURCE_REFS.json": {
       "kind": "provenance",
@@ -98,7 +98,7 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "c806763801b152165c700c187092560eb2b46f81ee29fa7247d2cdf66e1d8d5c",
+      "sha256": "f24ce173c8a5269ff24678c492bc70ec48e48a545ce75b8297a228fefc54ef4f",
       "size": 253
     },
     "records/HEADLINES.json": {
@@ -130,8 +130,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "b595fee2fe2f2b76697d250f9395bdeed4bf7077f7dede6244726220f6c134fd",
-      "size": 18608
+      "sha256": "df0aca4ce8050af698cd0057ff501b622e36bd54805cdabff8a13a1e5fd7b897",
+      "size": 26109
     },
     "src/benchmark_integrity/__init__.py": {
       "kind": "staging_support",
@@ -190,8 +190,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "d822e5c9e0b8803ba1f8aacb4349586b460ab5a2f24f61bb468a53a1ca192d7a",
-      "size": 2660
+      "sha256": "702920c1a69506dcee9189bcb9dae49da158ae0a8c63112351af411a74964869",
+      "size": 7840
     },
     "tests/test_capsule_verify.py": {
       "kind": "test",
@@ -199,8 +199,8 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "546c3fcaa578e40a7b8a0e53dee20da8ddd14d5f09fdcf4b75d15f67a2cf1da8",
-      "size": 1633
+      "sha256": "5de502903b857b28cb0113699a93592f02c0df6affd0f63a4d79cf2a3a1f55c4",
+      "size": 1710
     },
     "tests/test_kernel_smoke.py": {
       "kind": "test",
@@ -217,7 +217,7 @@
       "origin": {
         "type": "authored_private_staging"
       },
-      "sha256": "6c8dd15c0a77cc12cc953a2dd7df6bd735be73cd270fad41c195a5def238b27d",
+      "sha256": "847934cc552db4cf99bddb906fc235bf742ae3e9a98b3088dbc86b936585a129",
       "size": 165
     }
   },
