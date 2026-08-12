@@ -1,0 +1,55 @@
+{
+  "artifact": "paper3_private_capsule_source_refs",
+  "materialised_files": {
+    "records/paper3_literature_audit_result.json": {
+      "git_blob_sha1": "3769692b61aee89be79a2c0ba24add08e84a6f63",
+      "source_path": "results/paper3_literature_audit_result.json",
+      "source_ref": "478242f1233eaf3cb95d68e0f130c11a731f4095",
+      "source_repository": "randallyanh/GP4DGS",
+      "source_sha256": "ab641b44bab279571c49996462998e6d6901c2e99c9d39239465de4700634565",
+      "transformation": "none"
+    },
+    "src/benchmark_integrity/comparability.py": {
+      "git_blob_sha1": "1bae061fbdfb5ede2afcef8d5ac8e45bc31d8f3d",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
+      "source_sha256": "ebf8873f1de92b6fcd184bda90ad4953e670c446eee5ac13a04289fc8dc2d191",
+      "transformation": "none"
+    },
+    "src/benchmark_integrity/metric_conventions.py": {
+      "git_blob_sha1": "a358f46c57d323938d0b8190519d68a12ba36a72",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
+      "source_sha256": "eff08f78ec39851695b9d41424f54d72e84256e73c0ae995268564d26ecf82d1",
+      "transformation": "none"
+    },
+    "src/benchmark_integrity/region_error.py": {
+      "git_blob_sha1": "e507b3183a74e0296aea9916bdb2b54831a4e562",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
+      "source_sha256": "c21894872ace3b3cc26adfe8c7e4298c3c3439cd197e436168db667c40880d3c",
+      "transformation": "none"
+    }
+  },
+  "planned_not_materialised": [
+    "#103 final conformance vectors and independent oracle",
+    "#115 minimal array-to-RegionErrorStats adapter",
+    "Paper 3 seven-row replay modules and frozen records",
+    "formal first/second-pass literature records and rebuild tools",
+    "authorised-input manifest and raw replay"
+  ],
+  "release_blockers": [
+    "final Paper 3 revision tag",
+    "final #103 kernel boundary",
+    "final #115 adapter boundary",
+    "first-party code and record licence decisions",
+    "third-party licence and redistribution review",
+    "double-blind disclosure permission"
+  ],
+  "schema_version": 2,
+  "source_repository": "randallyanh/GP4DGS",
+  "status": "private_staging_not_release"
+}

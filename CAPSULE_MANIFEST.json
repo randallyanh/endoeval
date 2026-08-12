@@ -1,0 +1,227 @@
+{
+  "artifact": "paper3_private_capsule_manifest",
+  "external_anchor": "the exact Git commit containing this manifest",
+  "files": {
+    ".gitattributes": {
+      "kind": "packaging",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "f9520072d7454008539891365353b4d49f6ec2dc9df94685fe34056565990ee9",
+      "size": 130
+    },
+    ".gitignore": {
+      "kind": "packaging",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "50982e1f4d2fe63f1b6f4dc45be0274677ffd2c33ecd6ba982d4c6cc6906cf0b",
+      "size": 94
+    },
+    "INTERNAL_STAGING.md": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "7e40fef5065af31c9201d7285331147a2e837b6af246b155b2363ce2c8291ed4",
+      "size": 1368
+    },
+    "LICENSE_PENDING.md": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "5bde43f9649542ed31c2cd1c92f260b939d2ac942d4ce0914b3a749d362380a4",
+      "size": 617
+    },
+    "README.md": {
+      "kind": "documentation",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "b21c7c17f6277de60e0da5902c980cc3514312617f989840d808ed783c190a68",
+      "size": 2348
+    },
+    "RELEASE_SCOPE.md": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "19346a29ef9cccef5a6c28fb058859cc9c28db6e65886215581fec9a169b0cec",
+      "size": 1290
+    },
+    "SOURCE_REFS.json": {
+      "kind": "provenance",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "135cc56bc45effe0e54e7ed6162632745ae88329db191e2a8a6657a1fc7b1305",
+      "size": 2599
+    },
+    "THIRD_PARTY_NOTICES_DRAFT.md": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "b5f1a7da3ba886ac0f70436b8a053c1c08eee7afff1b5c0724226f32cf26583f",
+      "size": 786
+    },
+    "data/ACQUISITION.md": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "39aea770587b36cd5e2e1d87bb0b7869a0d51c17c0c32bd42a6e7b3072c0763d",
+      "size": 760
+    },
+    "data/expected_inputs.json": {
+      "kind": "policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "9c6d44ba8d63e56030dfc15f7055b9f86661f3fc9552e289d30849321f178f78",
+      "size": 521
+    },
+    "pyproject.toml": {
+      "kind": "packaging",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "c806763801b152165c700c187092560eb2b46f81ee29fa7247d2cdf66e1d8d5c",
+      "size": 253
+    },
+    "records/HEADLINES.json": {
+      "kind": "verification_policy",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "de22c630d55110c51f2437abda8eb93569b5b876694b2fdc515757330ed1c355",
+      "size": 1505
+    },
+    "records/paper3_literature_audit_result.json": {
+      "kind": "record_snapshot",
+      "mode": "100644",
+      "origin": {
+        "git_blob_sha1": "3769692b61aee89be79a2c0ba24add08e84a6f63",
+        "source_path": "results/paper3_literature_audit_result.json",
+        "source_ref": "478242f1233eaf3cb95d68e0f130c11a731f4095",
+        "source_repository": "randallyanh/GP4DGS",
+        "source_sha256": "ab641b44bab279571c49996462998e6d6901c2e99c9d39239465de4700634565",
+        "transformation": "none"
+      },
+      "sha256": "ab641b44bab279571c49996462998e6d6901c2e99c9d39239465de4700634565",
+      "size": 10752
+    },
+    "reproduce.py": {
+      "kind": "verifier",
+      "mode": "100755",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "b595fee2fe2f2b76697d250f9395bdeed4bf7077f7dede6244726220f6c134fd",
+      "size": 18608
+    },
+    "src/benchmark_integrity/__init__.py": {
+      "kind": "staging_support",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "acc68bd4d10ad025a04673e6f1521ae434de80f9285e10650ac7e739558b31b2",
+      "size": 207
+    },
+    "src/benchmark_integrity/comparability.py": {
+      "kind": "source_snapshot",
+      "mode": "100644",
+      "origin": {
+        "git_blob_sha1": "1bae061fbdfb5ede2afcef8d5ac8e45bc31d8f3d",
+        "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
+        "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+        "source_repository": "randallyanh/GP4DGS",
+        "source_sha256": "ebf8873f1de92b6fcd184bda90ad4953e670c446eee5ac13a04289fc8dc2d191",
+        "transformation": "none"
+      },
+      "sha256": "ebf8873f1de92b6fcd184bda90ad4953e670c446eee5ac13a04289fc8dc2d191",
+      "size": 15188
+    },
+    "src/benchmark_integrity/metric_conventions.py": {
+      "kind": "source_snapshot",
+      "mode": "100644",
+      "origin": {
+        "git_blob_sha1": "a358f46c57d323938d0b8190519d68a12ba36a72",
+        "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
+        "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+        "source_repository": "randallyanh/GP4DGS",
+        "source_sha256": "eff08f78ec39851695b9d41424f54d72e84256e73c0ae995268564d26ecf82d1",
+        "transformation": "none"
+      },
+      "sha256": "eff08f78ec39851695b9d41424f54d72e84256e73c0ae995268564d26ecf82d1",
+      "size": 4969
+    },
+    "src/benchmark_integrity/region_error.py": {
+      "kind": "source_snapshot",
+      "mode": "100644",
+      "origin": {
+        "git_blob_sha1": "e507b3183a74e0296aea9916bdb2b54831a4e562",
+        "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
+        "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+        "source_repository": "randallyanh/GP4DGS",
+        "source_sha256": "c21894872ace3b3cc26adfe8c7e4298c3c3439cd197e436168db667c40880d3c",
+        "transformation": "none"
+      },
+      "sha256": "c21894872ace3b3cc26adfe8c7e4298c3c3439cd197e436168db667c40880d3c",
+      "size": 9254
+    },
+    "tests/test_capsule_tamper.py": {
+      "kind": "test",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "d822e5c9e0b8803ba1f8aacb4349586b460ab5a2f24f61bb468a53a1ca192d7a",
+      "size": 2660
+    },
+    "tests/test_capsule_verify.py": {
+      "kind": "test",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "546c3fcaa578e40a7b8a0e53dee20da8ddd14d5f09fdcf4b75d15f67a2cf1da8",
+      "size": 1633
+    },
+    "tests/test_kernel_smoke.py": {
+      "kind": "test",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "cf798328e33cf4b15bf93c791213c9831b1d15b63995932fcfb5f323a4cdee9c",
+      "size": 915
+    },
+    "uv.lock": {
+      "kind": "packaging",
+      "mode": "100644",
+      "origin": {
+        "type": "authored_private_staging"
+      },
+      "sha256": "6c8dd15c0a77cc12cc953a2dd7df6bd735be73cd270fad41c195a5def238b27d",
+      "size": 165
+    }
+  },
+  "schema_version": 1,
+  "self_path": "CAPSULE_MANIFEST.json",
+  "status": "private_staging_not_release"
+}

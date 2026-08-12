@@ -1,0 +1,277 @@
+{
+  "answer_withheld_rederivation": {
+    "adjudicated_rows_changed_from_first_pass": 71,
+    "agreement_triggered_qa_corrections": 1,
+    "contexts": [
+      {
+        "answer_rows": 63,
+        "answer_sha256": "a61966ce1fb7a8f501920126081a697169dae8015a9a07f909ff048aceddd096",
+        "context": "COLD-A"
+      },
+      {
+        "answer_rows": 63,
+        "answer_sha256": "19261649403f1d87c3d48609cc4687044ce84574a98e1cba32825a05689a1e17",
+        "context": "COLD-B"
+      },
+      {
+        "answer_rows": 63,
+        "answer_sha256": "44cb3ac397389cae7a5855673ba0c5da23db583051ead7a68f99ecb1ad3ed341",
+        "context": "COLD-C"
+      }
+    ],
+    "exact_level": {
+      "agreed": 66,
+      "disagreed": 123,
+      "note": "value is free text on most fields, so a difference here is often wording",
+      "what_must_match": "the sealed digest: verdict plus every field's state, value and missing parts"
+    },
+    "field_level_differences": 178,
+    "instrument_commit": "40a5cfab7ac63f4e9b3f1611d0a13b3a79774b2e",
+    "limitation": "the receipt binds supplied inputs, answer bytes, context identifiers and ordering. It records an instruction-bound process; it is not transcript evidence and cannot prove that leakage was impossible",
+    "material_disagreement_field_rulings": 126,
+    "material_level": {
+      "additional_controlled_only_disagreements": 15,
+      "agreed": 93,
+      "controlled_value_disagreements": 25,
+      "disagreed": 96,
+      "field_disagreements": 126,
+      "what_requires_adjudication": "every state/closure disagreement and every unequal controlled value"
+    },
+    "name": "answer-withheld within-auditor re-derivation",
+    "ruling_selections": {
+      "first": 47,
+      "replacement": 15,
+      "second": 64
+    },
+    "state_level": {
+      "agreed": 93,
+      "disagreed": 96,
+      "field_disagreements": 111,
+      "what_must_match": "the evidence state of every field, and whether the field closes"
+    }
+  },
+  "artifact": "paper3_final_literature_audit_result",
+  "attribution": {
+    "denominator": 27,
+    "formal_adjudicated_verdicts": {
+      "conflicting": 0,
+      "fully_specified": 0,
+      "not_applicable": 0,
+      "not_located": 27,
+      "partially_specified": 0
+    },
+    "reporting_boundary": "the former loose 7/27 count came from the withdrawn pilot and is not promoted into the formal result; attribution remains separate from measurement definition",
+    "strong_inspectable_result_to_run_linkage": 0
+  },
+  "field_level_closures": {
+    "exact_evaluation_support": 17,
+    "metric_family": 27,
+    "named_scene_support": 14,
+    "output_target": 21,
+    "test_frame_or_split_rule": 0
+  },
+  "field_observation_summary": {
+    "evidence_states": {
+      "conflicting": 1,
+      "lineage_inferred": 1,
+      "not_applicable": 106,
+      "not_located": 445,
+      "paper_stated": 203
+    },
+    "observations": 756,
+    "stated_but_not_closed": 96
+  },
+  "inputs": {
+    "SECOND_PASS_INSTRUCTIONS.md": {
+      "git_blob_sha1": "a1ec3268a2b73aa76cc0756cc383cff74ebc5db1",
+      "path": "paper/protocol_audit/literature_audit/SECOND_PASS_INSTRUCTIONS.md",
+      "sha256": "598b16008051f0c042b2ffbd39b4b8ced8f22f20557eb69f72b50a8ff1b4acbb"
+    },
+    "adjudicated_dimension_judgements.jsonl": {
+      "git_blob_sha1": "7a522128100d4d4268e80ad956eaaf6a18da6dbe",
+      "path": "paper/protocol_audit/literature_audit/adjudicated_dimension_judgements.jsonl",
+      "sha256": "1023c311429c9f6decf3c9e69e25b74b6650df6ac7c7abb74bf9b3e21a62ec7a"
+    },
+    "adjudication.json": {
+      "git_blob_sha1": "39d8a7af58f2182876d1598e5bafea8d26677f30",
+      "path": "paper/protocol_audit/literature_audit/adjudication.json",
+      "sha256": "ebaa9a4710ae2ea262fdef09fee9578ab8570ca0284cbe7aa51f8b33caf5a24a"
+    },
+    "audit_protocol.json": {
+      "git_blob_sha1": "7c925d9a5f5ddee56356ce4adfaf9a1665cc583c",
+      "path": "paper/protocol_audit/literature_audit/audit_protocol.json",
+      "sha256": "34ed3f12755bbd9a065521a1f341f4be39c3da4571e7c566ef19f9d4953eed55"
+    },
+    "audit_scope_freeze.json": {
+      "git_blob_sha1": "ad4c1565aa7920810c5421d2d11c4d3b0ac7b575",
+      "path": "paper/protocol_audit/literature_audit/audit_scope_freeze.json",
+      "sha256": "127b2d7c7383d120aca5d3e2c6e8cee77d1cff710c8faee565a3adae2affbc7c"
+    },
+    "comparability_view.json": {
+      "git_blob_sha1": "1fe901edfd48db0e043e21e2c8ffa18e00f50ea4",
+      "path": "paper/protocol_audit/literature_audit/comparability_view.json",
+      "sha256": "0c5b2ce89c108afff28dbf63f7a013f8424c5c59a924082fe7af7d301bbc9eb7"
+    },
+    "field_dictionary.json": {
+      "git_blob_sha1": "1c75925d6d11b16fc2fe507a179d02ff5dc1d52b",
+      "path": "paper/protocol_audit/literature_audit/field_dictionary.json",
+      "sha256": "ca7610a3df483295ee1204d6f240065f703cd8f618868142df47be8058d545ed"
+    },
+    "first_pass_answers.jsonl": {
+      "git_blob_sha1": "1e7e6fea73817b77be276205a5f05a667e5f4fd0",
+      "path": "paper/protocol_audit/literature_audit/first_pass_answers.jsonl",
+      "sha256": "0603d15e0a7f4b02ebd35d8469ea95cad962f2c4c2abf5641d8462eacd976a97"
+    },
+    "first_pass_seal.json": {
+      "git_blob_sha1": "428c4f1540e3423d73af8fdc9213a158274111b2",
+      "path": "paper/protocol_audit/literature_audit/first_pass_seal.json",
+      "sha256": "01dce62d7dc98f36b719a71e082e05a1718cedbd75516302f35cbd06d3bcd255"
+    },
+    "pass_comparison.json": {
+      "git_blob_sha1": "8753640b6ba9a25e49164455f944b2e76e22a879",
+      "path": "paper/protocol_audit/literature_audit/pass_comparison.json",
+      "sha256": "994aa5e7f019451baa442a74ecc0f123db85ce80d700191d997e73542f1cda5c"
+    },
+    "second_pass_answers.jsonl": {
+      "git_blob_sha1": "4d830d7cbcf5f5ac617fbad21ef194433e9136ce",
+      "path": "paper/protocol_audit/literature_audit/second_pass_answers.jsonl",
+      "sha256": "4ec3b1da24db39d9b7354d1c9de90a93e142d719c6a6abe73ae01ed50e4b368a"
+    },
+    "second_pass_execution_receipt.json": {
+      "git_blob_sha1": "70625dacac533c3f852fbc12dd1f21f05a24ce28",
+      "path": "paper/protocol_audit/literature_audit/second_pass_execution_receipt.json",
+      "sha256": "97251cb8c0291824caca6f4f235448da5f17c8d552e5f3f0a6a2b5e20b016386"
+    },
+    "second_pass_input_manifest.json": {
+      "git_blob_sha1": "ca4707fcec7b23c4fe491ebc68a7273829f01d97",
+      "path": "paper/protocol_audit/literature_audit/second_pass_input_manifest.json",
+      "sha256": "e3291b2858c954ee9ded7199d3758dee54efac2ddee125a99f1537c27814ce7d"
+    },
+    "source_binding.json": {
+      "git_blob_sha1": "5cc6f88abf1f3a02119cd0c5e9bb69f208701955",
+      "path": "paper/protocol_audit/literature_audit/source_binding.json",
+      "sha256": "d1378a2dfb361360cb1dbcf6d3687a1f653949941625b91e5b9a7bf40034c511"
+    },
+    "source_package_receipt.json": {
+      "git_blob_sha1": "88a455208a8aea68a627751008151aeae92686d7",
+      "path": "paper/protocol_audit/literature_audit/source_package_receipt.json",
+      "sha256": "15046bf9705bd5b71cdf94706cdced9600772e333fa911e3cf5d1b57f5807ee3"
+    }
+  },
+  "interpretation_boundaries": [
+    "not_located is a recoverability statement, not proof that an experiment was wrong",
+    "the audit is a frozen scoping study, not a field-wide prevalence estimate",
+    "the two executions are contexts within one model-assisted audit, not independent raters",
+    "input and answer hashes document identity and ordering; they cannot prove zero leakage",
+    "a paper-level code release is not result-to-run attribution",
+    "an individually reproducible score is not automatically eligible for method ranking"
+  ],
+  "issue": 100,
+  "measurement_definition": {
+    "dimensions": [
+      "aggregation",
+      "metric_semantics",
+      "population",
+      "representation",
+      "support",
+      "target"
+    ],
+    "fully_specified_keys": [],
+    "headline": "0 of 162 result-unit-by-measurement-dimension judgements were fully specified after source adjudication.",
+    "judgements": 162,
+    "verdicts": {
+      "conflicting": 1,
+      "fully_specified": 0,
+      "not_applicable": 0,
+      "not_located": 50,
+      "partially_specified": 111
+    },
+    "verdicts_by_dimension": {
+      "aggregation": {
+        "conflicting": 0,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 16,
+        "partially_specified": 11
+      },
+      "metric_semantics": {
+        "conflicting": 0,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 0,
+        "partially_specified": 27
+      },
+      "population": {
+        "conflicting": 1,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 0,
+        "partially_specified": 26
+      },
+      "representation": {
+        "conflicting": 0,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 24,
+        "partially_specified": 3
+      },
+      "support": {
+        "conflicting": 0,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 10,
+        "partially_specified": 17
+      },
+      "target": {
+        "conflicting": 0,
+        "fully_specified": 0,
+        "not_applicable": 0,
+        "not_located": 0,
+        "partially_specified": 27
+      }
+    }
+  },
+  "population": {
+    "dimensions": 7,
+    "frozen_scoping_corpus_papers": 16,
+    "predefined_result_units": 27,
+    "result_bearing_papers": 8,
+    "result_unit_by_dimension_judgements": 189,
+    "source_scope_note": "The 27 result units are drawn from 8 papers inside the frozen 16-paper scoping corpus; other corpus papers are source context, not result-unit contributors."
+  },
+  "schema_version": "paper3-final-literature-audit-result/v3",
+  "source_lineage": {
+    "final_source_package_input_receipt_sha256": "e434dddadea7d11e76cb8074d2b8527bd2a75b9c3229bc71dfbdcc3ca8ff183c",
+    "protocol_sha256": "34ed3f12755bbd9a065521a1f341f4be39c3da4571e7c566ef19f9d4953eed55",
+    "source_package_receipt_file_sha256": "15046bf9705bd5b71cdf94706cdced9600772e333fa911e3cf5d1b57f5807ee3"
+  },
+  "status": "formal answer-withheld pass source-adjudicated",
+  "target_operationalization": {
+    "adjudicated": {
+      "conflicting": 0,
+      "fully_specified": 0,
+      "not_applicable": 0,
+      "not_located": 0,
+      "partially_specified": 27
+    },
+    "field": "estimand",
+    "first_pass": {
+      "conflicting": 0,
+      "fully_specified": 0,
+      "not_applicable": 0,
+      "not_located": 0,
+      "partially_specified": 27
+    },
+    "first_to_second_state_transitions": {
+      "not_located -> paper_stated": 27
+    },
+    "second_pass": {
+      "conflicting": 0,
+      "fully_specified": 6,
+      "not_applicable": 0,
+      "not_located": 0,
+      "partially_specified": 21
+    },
+    "state_level_disagreement_rows": 27
+  }
+}

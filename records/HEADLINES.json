@@ -1,0 +1,48 @@
+{
+  "artifact": "paper3_private_capsule_expected_headlines",
+  "schema_version": 1,
+  "source_record": "records/paper3_literature_audit_result.json",
+  "checks": [
+    {
+      "name": "result_units",
+      "path": ["population", "predefined_result_units"],
+      "expected": 27
+    },
+    {
+      "name": "formal_judgements",
+      "path": ["population", "result_unit_by_dimension_judgements"],
+      "expected": 189
+    },
+    {
+      "name": "measurement_judgements",
+      "path": ["measurement_definition", "judgements"],
+      "expected": 162
+    },
+    {
+      "name": "fully_specified_measurement_judgements",
+      "path": ["measurement_definition", "verdicts", "fully_specified"],
+      "expected": 0
+    },
+    {
+      "name": "strong_attribution_denominator",
+      "path": ["attribution", "denominator"],
+      "expected": 27
+    },
+    {
+      "name": "strong_result_to_run_attribution",
+      "path": ["attribution", "strong_inspectable_result_to_run_linkage"],
+      "expected": 0
+    },
+    {
+      "name": "adjudicated_rows_changed_from_first_pass",
+      "path": ["answer_withheld_rederivation", "adjudicated_rows_changed_from_first_pass"],
+      "expected": 71
+    },
+    {
+      "name": "exact_evaluation_support_closed",
+      "path": ["field_level_closures", "exact_evaluation_support"],
+      "expected": 17
+    }
+  ],
+  "interpretation": "These are frozen record-level checks. They do not independently repeat source searches, decode omitted images, or prove method capability."
+}

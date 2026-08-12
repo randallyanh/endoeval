@@ -1,0 +1,7 @@
+[project]
+name = "paper3-reproducibility-capsule-private"
+version = "0.1.0"
+description = "Private staging repository for the Paper 3 reproducibility capsule"
+requires-python = ">=3.11,<3.14"
+dependencies = []
+classifiers = ["Private :: Do Not Upload"]

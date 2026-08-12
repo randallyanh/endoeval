@@ -1,0 +1,13 @@
+{
+  "artifact": "paper3_private_expected_inputs",
+  "schema_version": 1,
+  "status": "pending_final_refs_and_licence_review",
+  "inputs": [],
+  "blocked_by": [
+    "#103 final kernel/conformance boundary",
+    "#115 final array-to-statistics adapter boundary",
+    "final Paper 3 replay evidence tag",
+    "exact third-party access and redistribution review"
+  ],
+  "rule": "No input is accepted by filename or directory position alone; the final manifest must bind logical/frame identity, representation and SHA-256."
+}
