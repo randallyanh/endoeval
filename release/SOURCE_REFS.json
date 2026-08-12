@@ -1,0 +1,34 @@
+{
+  "artifact": "endoeval_private_source_refs",
+  "schema_version": 1,
+  "status": "private_product_foundation_not_release",
+  "files": {
+    "src/benchmark_integrity/comparability.py": {
+      "source_repository": "randallyanh/GP4DGS",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
+      "git_blob_sha1": "1bae061fbdfb5ede2afcef8d5ac8e45bc31d8f3d",
+      "transformation": "none"
+    },
+    "src/benchmark_integrity/metric_conventions.py": {
+      "source_repository": "randallyanh/GP4DGS",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
+      "git_blob_sha1": "a358f46c57d323938d0b8190519d68a12ba36a72",
+      "transformation": "none"
+    },
+    "src/benchmark_integrity/region_error.py": {
+      "source_repository": "randallyanh/GP4DGS",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
+      "git_blob_sha1": "e507b3183a74e0296aea9916bdb2b54831a4e562",
+      "transformation": "none"
+    }
+  },
+  "pending": [
+    "#103 final public conformance vectors and independent oracle",
+    "#115 final image-to-statistics adapter",
+    "canonical EndoNeRF frame/support authorities",
+    "licence and public-disclosure decisions"
+  ]
+}
