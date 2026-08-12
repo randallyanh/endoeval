@@ -1,0 +1,7 @@
+[project]
+name = "endoeval-private"
+version = "0.1.0.dev0"
+description = "Private foundation for canonical dynamic-endoscopy evaluation profiles"
+requires-python = ">=3.13,<3.14"
+dependencies = []
+classifiers = ["Private :: Do Not Upload"]

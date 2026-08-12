@@ -1,0 +1,19 @@
+{
+  "artifact": "endoeval_submission",
+  "schema_version": 1,
+  "profile": "endonerf-rgb-v1",
+  "method": {
+    "name": "example-method",
+    "version": "development"
+  },
+  "scenes": [
+    {
+      "scene": "cutting",
+      "predictions": "predictions/cutting"
+    },
+    {
+      "scene": "pulling",
+      "predictions": "predictions/pulling"
+    }
+  ]
+}
