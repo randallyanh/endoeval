@@ -1,0 +1,240 @@
+{
+  "artifact": "endoeval_dataset_authority",
+  "dataset_release": "paper3-frozen-endonerf-evaluation-v1",
+  "dimensions_wh": [
+    640,
+    512
+  ],
+  "profile_id": "endonerf-rgb-v1",
+  "scenes": [
+    {
+      "dataset_scene": "cutting_tissues_twice",
+      "frames": [
+        {
+          "frame_id": "000001",
+          "invalid_mask_sha256": "4c68431379c478ef38f05ddd8aee6941c4b8d5f57d7b3ff1119690a357348f89",
+          "native_frame_id": 1,
+          "reference_sha256": "66e9a67cfce3a4b4e3a547548812224aa389e70d1c41851a9ac47eadf7f61987",
+          "tool_mask_sha256": "784ef151899a78135cad89a94d61b818894d85c4d32cd5293d51a9ae7add1c3b"
+        },
+        {
+          "frame_id": "000009",
+          "invalid_mask_sha256": "de82a1641e7424481e1aa9ae5d6366ec098e13d6ce2167f78b5c72322f5c533c",
+          "native_frame_id": 9,
+          "reference_sha256": "3c4f3c76c77e001a543cff19136d04b194c08d547190bb72b48601771fecdf84",
+          "tool_mask_sha256": "eff1296e73ea15fecdd5f7e081016a0ecf04f2768fa20c98b7dfe51f5e368d8d"
+        },
+        {
+          "frame_id": "000017",
+          "invalid_mask_sha256": "92a74b739484e9761a3915852fecd9bca8f6326eedcb074e28abac4efad72e21",
+          "native_frame_id": 17,
+          "reference_sha256": "8aefd246d8f0d48ff40f4a3bbfcaa9ce2c01eabc7a9bc18224cb4ac729279087",
+          "tool_mask_sha256": "881573b5fcd5ae8d480f24ad93bf336ad3656abcd7698c4fde0966d2a6c2f135"
+        },
+        {
+          "frame_id": "000025",
+          "invalid_mask_sha256": "c5efe9317688e8fded44ae1e84e91d31169f0531907bebc68bd96be2b18fe671",
+          "native_frame_id": 25,
+          "reference_sha256": "8fb0ed5c14803800f05500de9ad4d89c1d151fc26743c912c63d8873f414c4cb",
+          "tool_mask_sha256": "29e344c5cbee8534b1fcbd0861b8ef67432ca5edb8f451dc5b3cb9f8d0acf4d0"
+        },
+        {
+          "frame_id": "000033",
+          "invalid_mask_sha256": "c2073266cbd5f247c4c9b4e1e48e6c43c99f526fd5f06c84abb634ee8afef93f",
+          "native_frame_id": 33,
+          "reference_sha256": "3f82a69770fccfad5bab8b1bf659e544215a355defd8c776733289137d694735",
+          "tool_mask_sha256": "40d30d729694005131316f2d6d1524f3d11b4f7427544ae8edf0f90f74a10096"
+        },
+        {
+          "frame_id": "000041",
+          "invalid_mask_sha256": "69728a722801ed3028413c67533b25f549c23a545497b12253a811434fe84c65",
+          "native_frame_id": 41,
+          "reference_sha256": "d429bce45ed6f278a3a83848f4a4ac59843e2795f5fb1939533c02e9bc307577",
+          "tool_mask_sha256": "050b7c8838b71b06002625a3f624a979648e09e138bc4c308fda249dc2585669"
+        },
+        {
+          "frame_id": "000049",
+          "invalid_mask_sha256": "2a153308de5238e9dada1673ad4babeb80359a748110a33774f7999e9450c954",
+          "native_frame_id": 49,
+          "reference_sha256": "fcb92fde9ccc0d3bdead4639ddb03fc3a5125aa657b42110cab56c3a9a1411fa",
+          "tool_mask_sha256": "27f2d683582ddfe9a772ba41b2ffe7695675d301d5db71a81a796b03af3db37e"
+        },
+        {
+          "frame_id": "000057",
+          "invalid_mask_sha256": "d128f8b102f360918ed3117678e7eede5213f74ecfb8504c7fd79924b09530df",
+          "native_frame_id": 57,
+          "reference_sha256": "d191ebcc888cafe18d398f760f1c1d1faf31ccd8500fe110cfb5c910c97ecc91",
+          "tool_mask_sha256": "0e9dd3d16f330154b026d4f8520fe1cd107b0086b48606cf5267dd192d1b1031"
+        },
+        {
+          "frame_id": "000065",
+          "invalid_mask_sha256": "17cb53fb314eb17fc091e271cd59b78f786dce33887c81091cd22fba756c0e6c",
+          "native_frame_id": 65,
+          "reference_sha256": "aa21b5b0fe336faf531a7c3e9b66194f8595a6efa5237107bab8458942ed4cc6",
+          "tool_mask_sha256": "5d0fe2b6749e51fb2e823326ff252327314269f8e53ff3a3d2f7c19e4f53174b"
+        },
+        {
+          "frame_id": "000073",
+          "invalid_mask_sha256": "77501705dda35862714d0cab672e14c990f7f4d57e9e7d95ccb5776917803f78",
+          "native_frame_id": 73,
+          "reference_sha256": "ebd54ef55ef5652eb1c0ace19199ed3cd84995089517b748f604a35318d70dc1",
+          "tool_mask_sha256": "10dc179bd6eb5c4b813426aa7765b951c3c93b4a0199322a54299ff4c3a97939"
+        },
+        {
+          "frame_id": "000081",
+          "invalid_mask_sha256": "8a10970947ca10b7be014a608484bbade794731fbb893dfb48be5af1e836de2d",
+          "native_frame_id": 81,
+          "reference_sha256": "6b5ab3f9117eb3c99dcbd21ddb2f3f9c9062eb641d925369248d7abd1e503d00",
+          "tool_mask_sha256": "165302510a1eaba4fffe1397bd5ae2caa03e1c840f109e2270f8d4e7ab8e9793"
+        },
+        {
+          "frame_id": "000089",
+          "invalid_mask_sha256": "2573b8ee5295998df16d86c201b2d05aad17aa37aefaee0c2d9e2db4a49b1c01",
+          "native_frame_id": 89,
+          "reference_sha256": "da87f127953261f1d2773180cad80669f14534c69a6f44be3f8e154362846edf",
+          "tool_mask_sha256": "f63232af1b422b0f32c7c454caea9869d1eb1567f85163842c74b203214ba71e"
+        },
+        {
+          "frame_id": "000097",
+          "invalid_mask_sha256": "2330c40e306b95125546192594d6620d7cdc7f67266473c3c4e52d51fce225b8",
+          "native_frame_id": 97,
+          "reference_sha256": "cc43597efbe7d2cb86235f119762f9ca87e4f545b393ed6d432b60103c043117",
+          "tool_mask_sha256": "c9d6547f537eca036d6b0e02b82fd3c990c562d70c306c4881b436b0d75edb3b"
+        },
+        {
+          "frame_id": "000105",
+          "invalid_mask_sha256": "debd168eaa27b5a838e03aefdd71f6646af23daee518708610dbe6acf6fe991e",
+          "native_frame_id": 105,
+          "reference_sha256": "13e7672cfea937555214b129644edd0eb3485462b25e7274d80922577f4156c5",
+          "tool_mask_sha256": "e8ed770f042db2765a64655356602a42914565afff183c1bbfebe0bc09a6817d"
+        },
+        {
+          "frame_id": "000113",
+          "invalid_mask_sha256": "a59a12a589ecea0a808c4deb6c39712319e3a33a82bb45a505ab2fd4da15acf1",
+          "native_frame_id": 113,
+          "reference_sha256": "200289ccb4261ba209fe4d633371bc667d161160c2b73b8e44e1170d73ef2a9e",
+          "tool_mask_sha256": "4393fa7b721377e0a863c69735af5bce24f64e352ce69fff2f5fc0591f4a15e3"
+        },
+        {
+          "frame_id": "000121",
+          "invalid_mask_sha256": "d4a354a9fec5d49215d1c10db4332ae2763ddf1a94d44b36c6d24260569bf535",
+          "native_frame_id": 121,
+          "reference_sha256": "60b7fd9ba67d9160d14a5027ad133d0c23d01a85a8066f3ddf935764c999a39c",
+          "tool_mask_sha256": "63fcecdb3334f42b19269bbabff66a99cd6651c5a5310cc5470bcfc6d13563cf"
+        },
+        {
+          "frame_id": "000129",
+          "invalid_mask_sha256": "650fdcdf614e2bd41aec3d24fc34a7150f2836f75b5e83efa0510d6be23caf24",
+          "native_frame_id": 129,
+          "reference_sha256": "ce813e938f1f753d1e68c0b72689471e23e4bd57657bcaccb09f61384fcdc4db",
+          "tool_mask_sha256": "4068c23ae624093bb50d0c6766531efa80d03f855e26fdde3cedded9cd589ea5"
+        },
+        {
+          "frame_id": "000137",
+          "invalid_mask_sha256": "2970e72ec4564933737b4e25ed1dd209e1f4bffd66d0f77cacad03d5204cd348",
+          "native_frame_id": 137,
+          "reference_sha256": "d1b0a1c981da839c8d7f2b0bdca2898a58cda3c9efa8b258aa0f8ac40c807eee",
+          "tool_mask_sha256": "b75a96bde4a43d9d0476a3eb1d451fef2455f3fdc889d8cb1838929ce37a00d0"
+        },
+        {
+          "frame_id": "000145",
+          "invalid_mask_sha256": "cbcb2fedfe9668b06e28f1f296ded5c6315af562c5b8eebbcd0b73be0a217616",
+          "native_frame_id": 145,
+          "reference_sha256": "de4dad318a98f443ec8b51a8307f80247c96db19ffc5b28271ad661602011829",
+          "tool_mask_sha256": "b421949d33e4397a54d338fdd5b6f25ed6a23f471a5c0f23217b6efac059f65c"
+        },
+        {
+          "frame_id": "000153",
+          "invalid_mask_sha256": "b2472fec65e04661e278263852e5b8ac35a2c1918028fa9f3d99e51cba7b9296",
+          "native_frame_id": 153,
+          "reference_sha256": "2b7392bf3a2d25843bac6e524b3e07ff743c6748ca4a51aa91f222b305e89143",
+          "tool_mask_sha256": "0aae59405205526cb1ce672d0d83d7935f9aeb5d07895ea228d826c4dac09394"
+        }
+      ],
+      "invalid_mask_template": "cutting_tissues_twice/masks/{frame_id}.png",
+      "reference_template": "cutting_tissues_twice/images/{frame_id}.png",
+      "scene": "cutting",
+      "tool_mask_template": "cutting_tissues_twice/gt_masks/{frame_id}.png"
+    },
+    {
+      "dataset_scene": "pulling_soft_tissues",
+      "frames": [
+        {
+          "frame_id": "000001",
+          "invalid_mask_sha256": "f2196e0c9fe1dcf7392ddb0d936abe3aca21946c4023ae3632b6e9e67bec63af",
+          "native_frame_id": 1,
+          "reference_sha256": "3e85232afb607b2a01c356ab2681aa59ace556ee7c077dead920acd28c87c8f4",
+          "tool_mask_sha256": "5f5d39e75fb5eb2c1930823bd947a644dda18fa2c79b4e8d433d0f215dfb6861"
+        },
+        {
+          "frame_id": "000009",
+          "invalid_mask_sha256": "fd47f9b157d48096420fd4ce05c39ad84788c428ec97339adfd44db00dc8f232",
+          "native_frame_id": 9,
+          "reference_sha256": "fb9f43b2122ee1d54bb2a136032bc0c259fb80f0adef610368b994c34096fafd",
+          "tool_mask_sha256": "e1b90c99b47159e2871ce3eedadabee9780328d4d25be262315acd77b45688f9"
+        },
+        {
+          "frame_id": "000017",
+          "invalid_mask_sha256": "fb29067e4d45a180c55e86989941544e27e89b7851d7554246aba7250673f632",
+          "native_frame_id": 17,
+          "reference_sha256": "bff751e3080346b8c4e7638bd3ce2bc8836a31d6897352e75148978670884477",
+          "tool_mask_sha256": "5eaa062c64d6d2284c27f6db63db69aaac51d96f931336e4c65e0b620e38ecd1"
+        },
+        {
+          "frame_id": "000025",
+          "invalid_mask_sha256": "0733dc77199f4a6f52c3e58404fc6b064f2065141358099b5f0fb664abdd7860",
+          "native_frame_id": 25,
+          "reference_sha256": "1a19ea83c5ef0c4802fd3cfd7366a7b16ae85ba0e6cc74200b42c7aa502becd0",
+          "tool_mask_sha256": "3dd66a820b389c4170e337a640cdcc13a3293530c98006bc6123ba5cf5607023"
+        },
+        {
+          "frame_id": "000033",
+          "invalid_mask_sha256": "99c6d58bf6124fd96a0e9ed05d9860446abb5439e5339ad13f9e77d74c56b409",
+          "native_frame_id": 33,
+          "reference_sha256": "7dbb3139717621ecccf76ea59724998e1727495a25694b09b1b0fe5848a17c35",
+          "tool_mask_sha256": "ce2f302ec18ca2865675d6efc546ad1d8a5fec93477a7c6e0e9222102ddf25a4"
+        },
+        {
+          "frame_id": "000041",
+          "invalid_mask_sha256": "1fbd98bc34a423e4a4f89ee21f1c12c153bde251a2fcfc34236af6eafae296a6",
+          "native_frame_id": 41,
+          "reference_sha256": "48721a0095070dde1e28ecda96e651b6e6634956e8272b7ba46224538f1a284c",
+          "tool_mask_sha256": "4c0ead961bf8615a5b01413f5846db7d01d6d18f29e217dbd211bd9ce5ec7ef3"
+        },
+        {
+          "frame_id": "000049",
+          "invalid_mask_sha256": "dc13cd9ccf476299f00c7232dea064d56bb2203c32b6bcd15ec1f88b1f0a19fa",
+          "native_frame_id": 49,
+          "reference_sha256": "4fcb7268616ffa0a5401c41b5413611f0b49b8341e3f9171a876503a69653cfd",
+          "tool_mask_sha256": "80895cedffda42a3ecd36e1ea432c40b549d57f30c99f5c8ec3f99735c11ae1e"
+        },
+        {
+          "frame_id": "000057",
+          "invalid_mask_sha256": "91af82bd993c7b4a0d0b555a2afef95653dde7774d748af4e396510bea0f84cf",
+          "native_frame_id": 57,
+          "reference_sha256": "012e2f200436b4b7b7338f5c4e7c3cd34e8fd1cd71822e3da30cee1ec0dffeae",
+          "tool_mask_sha256": "607d728bddb60da890562964f9cc98bdb5a99bb09d623d4e3410b2619d00be71"
+        }
+      ],
+      "invalid_mask_template": "pulling_soft_tissues/masks/frame-{frame_id}.mask.png",
+      "reference_template": "pulling_soft_tissues/images/frame-{frame_id}.color.png",
+      "scene": "pulling",
+      "tool_mask_template": "pulling_soft_tissues/gt_masks/frame-{frame_id}.mask.png"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "interpretation": "Frozen frame and dataset-owned support authority; no method scores participate in this profile definition.",
+    "records": [
+      "results/paper3_row_inventory.json",
+      "results/paper3_canonical_mask.json",
+      "paper/paper3_sensitivity_plan.json"
+    ],
+    "ref": "5a6e653518a79fba73b456a620d009a2ef509264",
+    "repository": "randallyanh/GP4DGS"
+  },
+  "support": {
+    "definition": "not(tool_mask > 0.5) AND not(invalid_mask > 0.5)",
+    "threshold": 0.5
+  }
+}

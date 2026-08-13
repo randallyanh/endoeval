@@ -1,0 +1,36 @@
+{
+  "artifact": "endoeval_profile",
+  "dataset": {
+    "authority": "endonerf-rgb-v1-authority.json",
+    "name": "EndoNeRF",
+    "release": "paper3-frozen-endonerf-evaluation-v1"
+  },
+  "domain": "dynamic_endoscopic_reconstruction",
+  "measurement": {
+    "frame_reduction": "unweighted_frame_mean",
+    "metric": {
+      "convention": "psnr_mse_eps_1e-10",
+      "data_range": 1.0,
+      "denominator": "true_exclusion",
+      "family": "PSNR"
+    },
+    "output_target": "RGB reconstruction on the frozen EndoNeRF evaluation frames",
+    "scene_reduction": "equal_scene_weight",
+    "support": "dataset-valid non-tool tissue"
+  },
+  "outputs": [
+    "metrics.json",
+    "evaluation_receipt.json",
+    "paper_table.csv",
+    "admission.json"
+  ],
+  "profile_id": "endonerf-rgb-v1",
+  "schema_version": 1,
+  "status": "ready",
+  "submission": {
+    "image_encoding": "png_rgb",
+    "input": "rendered_rgb_images",
+    "path_template": "predictions/{scene}/{frame_id}.png"
+  },
+  "task": "rgb_reconstruction"
+}

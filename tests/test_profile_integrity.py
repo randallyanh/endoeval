@@ -1,52 +1,21 @@
 from __future__ import annotations
-
-import json
-import subprocess
-import sys
-import tempfile
-import unittest
+import sys,unittest
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-COMMAND = [sys.executable, "-I", "-S", "-B", "endoeval.py", "validate"]
-
+ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT/'src'))
+from endoeval.contracts import EndoEvalError,load_authority,load_profile,safe_relative_path
 
 class ProfileIntegrityTests(unittest.TestCase):
-    def test_invalid_submission_contracts_fail_closed(self) -> None:
-        cases = [
-            {
-                "artifact": "endoeval_submission",
-                "schema_version": 1,
-                "profile": "endonerf-rgb-v1",
-                "method": {"name": "x"},
-                "scenes": [
-                    {"scene": "cutting", "predictions": "../outside"},
-                    {"scene": "pulling", "predictions": "predictions/pulling"},
-                ],
-            },
-            {
-                "artifact": "endoeval_submission",
-                "schema_version": 1,
-                "profile": "unknown-profile",
-                "method": {"name": "x"},
-                "scenes": [],
-            },
-        ]
-        for index, document in enumerate(cases):
-            with self.subTest(index=index), tempfile.TemporaryDirectory() as directory:
-                path = Path(directory) / "submission.json"
-                path.write_text(json.dumps(document), encoding="utf-8")
-                completed = subprocess.run(
-                    [*COMMAND, str(path)],
-                    cwd=ROOT,
-                    text=True,
-                    capture_output=True,
-                    check=False,
-                )
-                self.assertEqual(completed.returncode, 1)
-                error = json.loads(completed.stderr)
-                self.assertEqual(error["status"], "error")
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_bundled_profile_and_input_boundary(self):
+        profile=load_profile('endonerf-rgb-v1'); authority,_=load_authority(profile)
+        self.assertEqual(profile['status'],'ready')
+        self.assertEqual([len(s['frames']) for s in authority['scenes']],[20,8])
+        self.assertEqual(sum(len(s['frames']) for s in authority['scenes']),28)
+        self.assertEqual(authority['support']['definition'],'not(tool_mask > 0.5) AND not(invalid_mask > 0.5)')
+        for scene in authority['scenes']:
+            self.assertEqual(len({f['frame_id'] for f in scene['frames']}),len(scene['frames']))
+            for frame in scene['frames']:
+                for key in ('reference_sha256','tool_mask_sha256','invalid_mask_sha256'):
+                    self.assertEqual(len(frame[key]),64)
+        for bad in ('../outside','a\\b','/absolute','C:\\outside','a//b'):
+            with self.assertRaises(EndoEvalError): safe_relative_path(bad,field='test')
+if __name__=='__main__': unittest.main()

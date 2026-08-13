@@ -1,7 +1,28 @@
+[build-system]
+requires = ["setuptools==82.0.1"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "endoeval-private"
-version = "0.1.0.dev0"
-description = "Private foundation for canonical dynamic-endoscopy evaluation profiles"
+version = "0.2.0.dev0"
+description = "Profile-driven evaluation for dynamic endoscopic reconstruction"
+readme = "README.md"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+  "numpy==2.3.5",
+  "Pillow==12.3.0",
+]
 classifiers = ["Private :: Do Not Upload"]
+
+[project.scripts]
+endoeval = "endoeval.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"endoeval.profiles" = ["*.json"]
