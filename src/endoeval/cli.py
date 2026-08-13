@@ -5,8 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, TextIO
 
 from endoeval.contracts import (
     EndoEvalError,
@@ -22,11 +23,34 @@ from endoeval.receipts import compare_receipts, verify_receipt
 from endoeval.scoring import evaluate
 
 
-def _print(document: object, *, stream: Any = sys.stdout) -> None:
+def _print(document: object, *, stream: TextIO = sys.stdout) -> None:
     print(json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False), file=stream)
 
 
-def _init_submission(args: argparse.Namespace) -> dict[str, Any]:
+def _profiles_command(args: argparse.Namespace) -> dict[str, Any]:
+    return {"artifact": "endoeval_profiles", "profiles": list_profiles()}
+
+
+def _profile_command(args: argparse.Namespace) -> dict[str, Any]:
+    profile = load_profile(args.profile_id)
+    authority, authority_path = load_authority(profile)
+    return {
+        "artifact": "endoeval_profile_summary",
+        "profile": profile,
+        "authority": {
+            "path": str(authority_path),
+            "dataset_release": authority["dataset_release"],
+            "dimensions_wh": authority["dimensions_wh"],
+            "support": authority["support"],
+            "scenes": [
+                {"scene": scene["scene"], "frames": len(scene["frames"])}
+                for scene in authority["scenes"]
+            ],
+        },
+    }
+
+
+def _init_command(args: argparse.Namespace) -> dict[str, Any]:
     profile = load_profile(args.profile)
     authority, _ = load_authority(profile)
     destination = args.directory.expanduser().resolve()
@@ -69,26 +93,7 @@ def _init_submission(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
-def _profile_summary(profile_id: str) -> dict[str, Any]:
-    profile = load_profile(profile_id)
-    authority, authority_path = load_authority(profile)
-    return {
-        "artifact": "endoeval_profile_summary",
-        "profile": profile,
-        "authority": {
-            "path": str(authority_path),
-            "dataset_release": authority["dataset_release"],
-            "dimensions_wh": authority["dimensions_wh"],
-            "support": authority["support"],
-            "scenes": [
-                {"scene": scene["scene"], "frames": len(scene["frames"])}
-                for scene in authority["scenes"]
-            ],
-        },
-    }
-
-
-def _validate(args: argparse.Namespace) -> dict[str, Any]:
+def _validate_command(args: argparse.Namespace) -> dict[str, Any]:
     validated = validate_submission(args.submission)
     files = validate_prediction_directories(validated) if args.check_paths else None
     return {
@@ -99,8 +104,26 @@ def _validate(args: argparse.Namespace) -> dict[str, Any]:
         "scenes": [scene["scene"] for scene in validated["scenes"]],
         "filesystem_checked": args.check_paths,
         "prediction_files": files,
-        "method_specific_adapter_required": False,
     }
+
+
+def _evaluate_command(args: argparse.Namespace) -> dict[str, Any]:
+    return evaluate(
+        args.submission,
+        dataset_root=args.dataset_root,
+        output=args.output,
+        overwrite=args.overwrite,
+    )
+
+
+def _verify_command(args: argparse.Namespace) -> dict[str, Any]:
+    result = verify_receipt(args.receipt)
+    result.pop("receipt", None)
+    return result
+
+
+def _compare_command(args: argparse.Namespace) -> dict[str, Any]:
+    return compare_receipts(args.left, args.right, claim=args.claim)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -109,10 +132,13 @@ def _parser() -> argparse.ArgumentParser:
         description="Canonical evaluation for dynamic endoscopic reconstruction outputs.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("profiles", help="list installed evaluation profiles")
+
+    profiles_parser = subparsers.add_parser("profiles", help="list installed evaluation profiles")
+    profiles_parser.set_defaults(run=_profiles_command)
 
     profile_parser = subparsers.add_parser("profile", help="show one versioned profile")
     profile_parser.add_argument("profile_id")
+    profile_parser.set_defaults(run=_profile_command)
 
     init_parser = subparsers.add_parser("init", help="create a method-independent submission")
     init_parser.add_argument("directory", type=Path)
@@ -120,58 +146,44 @@ def _parser() -> argparse.ArgumentParser:
     init_parser.add_argument("--method", required=True)
     init_parser.add_argument("--method-version")
     init_parser.add_argument("--source-commit")
+    init_parser.set_defaults(run=_init_command)
 
     validate_parser = subparsers.add_parser("validate", help="validate a submission")
     validate_parser.add_argument("submission", type=Path)
     validate_parser.add_argument("--check-paths", action="store_true")
+    validate_parser.set_defaults(run=_validate_command)
 
     evaluate_parser = subparsers.add_parser("evaluate", help="score rendered outputs")
     evaluate_parser.add_argument("submission", type=Path)
     evaluate_parser.add_argument("--dataset-root", type=Path, required=True)
     evaluate_parser.add_argument("--output", type=Path)
     evaluate_parser.add_argument("--overwrite", action="store_true")
+    evaluate_parser.set_defaults(run=_evaluate_command)
 
     verify_parser = subparsers.add_parser("verify", help="verify an evaluation receipt")
     verify_parser.add_argument("receipt", type=Path)
+    verify_parser.set_defaults(run=_verify_command)
 
     compare_parser = subparsers.add_parser("compare", help="compare two verified receipts")
     compare_parser.add_argument("left", type=Path)
     compare_parser.add_argument("right", type=Path)
     compare_parser.add_argument("--claim", choices=("scalar", "ordering", "capability"), default="ordering")
+    compare_parser.set_defaults(run=_compare_command)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        if args.command == "profiles":
-            result = {"artifact": "endoeval_profiles", "profiles": list_profiles()}
-        elif args.command == "profile":
-            result = _profile_summary(args.profile_id)
-        elif args.command == "init":
-            result = _init_submission(args)
-        elif args.command == "validate":
-            result = _validate(args)
-        elif args.command == "evaluate":
-            result = evaluate(
-                args.submission,
-                dataset_root=args.dataset_root,
-                output=args.output,
-                overwrite=args.overwrite,
-            )
-        elif args.command == "verify":
-            result = verify_receipt(args.receipt)
-            result.pop("receipt", None)
-        else:
-            result = compare_receipts(args.left, args.right, claim=args.claim)
-        _print(result)
-        return 0
+        result = args.run(args)
     except (EndoEvalError, ValueError) as exc:
         _print(
             {"artifact": "endoeval_error", "status": "error", "error": str(exc)},
             stream=sys.stderr,
         )
         return 1
+    _print(result)
+    return 0
 
 
 __all__ = ["main"]

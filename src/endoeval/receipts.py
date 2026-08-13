@@ -8,6 +8,7 @@ from typing import Any
 from benchmark_integrity.comparability import ComparisonFacts, assess_comparability
 from endoeval.contracts import (
     EndoEvalError,
+    OUTPUT_ARTIFACTS,
     canonical_sha256,
     file_sha256,
     load_authority,
@@ -15,13 +16,10 @@ from endoeval.contracts import (
     load_profile,
 )
 
-
-def verify_receipt(receipt_path: Path) -> dict[str, Any]:
-    receipt_path = receipt_path.expanduser().resolve()
-    receipt = load_json(receipt_path)
-    if not isinstance(receipt, dict):
-        raise EndoEvalError("receipt must be a JSON object")
-    required = {
+_RECEIPT_NAME = "evaluation_receipt.json"
+_HASHED_OUTPUTS = frozenset(OUTPUT_ARTIFACTS) - {_RECEIPT_NAME}
+_RECEIPT_KEYS = frozenset(
+    {
         "artifact",
         "schema_version",
         "profile_id",
@@ -37,10 +35,18 @@ def verify_receipt(receipt_path: Path) -> dict[str, Any]:
         "outputs",
         "receipt_sha256",
     }
-    if set(receipt) != required:
+)
+
+
+def verify_receipt(receipt_path: Path) -> dict[str, Any]:
+    receipt_path = receipt_path.expanduser().resolve()
+    receipt = load_json(receipt_path)
+    if not isinstance(receipt, dict):
+        raise EndoEvalError("receipt must be a JSON object")
+    if set(receipt) != _RECEIPT_KEYS:
         raise EndoEvalError(
-            f"receipt keys differ: extra={sorted(set(receipt) - required)}, "
-            f"missing={sorted(required - set(receipt))}"
+            f"receipt keys differ: extra={sorted(set(receipt) - _RECEIPT_KEYS)}, "
+            f"missing={sorted(_RECEIPT_KEYS - set(receipt))}"
         )
     if receipt["artifact"] != "endoeval_evaluation_receipt" or receipt["schema_version"] != 1:
         raise EndoEvalError("receipt has an unsupported identity")
@@ -60,11 +66,7 @@ def verify_receipt(receipt_path: Path) -> dict[str, Any]:
         raise EndoEvalError("the installed authority differs from the evaluated authority")
     output_dir = receipt_path.parent
     outputs = receipt["outputs"]
-    if not isinstance(outputs, dict) or set(outputs) != {
-        "metrics.json",
-        "paper_table.csv",
-        "admission.json",
-    }:
+    if not isinstance(outputs, dict) or set(outputs) != _HASHED_OUTPUTS:
         raise EndoEvalError("receipt output set differs from the profile contract")
     for name, expected in outputs.items():
         path = output_dir / name
@@ -79,6 +81,8 @@ def verify_receipt(receipt_path: Path) -> dict[str, Any]:
         raise EndoEvalError("metrics/profile mismatch")
     if admission.get("measurement_sha256") != receipt["measurement_sha256"]:
         raise EndoEvalError("admission/measurement mismatch")
+    # both floats come from the same evaluation through json.dumps, and Python
+    # float repr round-trips exactly, so identity — not tolerance — is correct
     if metrics.get("aggregate", {}).get("psnr_db") != receipt["aggregate_psnr_db"]:
         raise EndoEvalError("receipt aggregate differs from metrics.json")
     return {
