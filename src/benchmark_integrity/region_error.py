@@ -1,4 +1,4 @@
-"""Exact masked-PSNR coverage decomposition and score transport.
+"""Exact masked-PSNR coverage decomposition.
 
 One numerical owner for the relation between scoring a selected region with
 its own denominator (``true exclusion``) and scoring the same squared error
@@ -224,7 +224,8 @@ def _resolve(
     infinite = (math.isinf(true_psnr), math.isinf(keep_psnr))
     if all(infinite):
         return PsnrDenominatorResult(_TIED_PERFECT, true_mse, keep_mse, true_psnr, keep_psnr, None)
-    if any(infinite):  # pragma: no cover - zero selected SSE makes both infinite
+    if any(infinite):
+        # unreachable under one shared SSE: zero error makes both infinite
         return PsnrDenominatorResult(_UNSUPPORTED, true_mse, keep_mse, true_psnr, keep_psnr, None)
     return PsnrDenominatorResult(
         _COMPLETE, true_mse, keep_mse, true_psnr, keep_psnr, keep_psnr - true_psnr
