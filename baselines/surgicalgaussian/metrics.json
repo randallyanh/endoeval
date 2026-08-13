@@ -8,7 +8,7 @@
   "method": {
     "name": "surgicalgaussian",
     "source_commit": "c0ac51a",
-    "version": "official_code_retrain_iter3000"
+    "version": "official_code_retrain_iter40000"
   },
   "metric": {
     "convention": "psnr_mse_eps_1e-10",

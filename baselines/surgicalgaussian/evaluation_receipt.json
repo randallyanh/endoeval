@@ -1,7 +1,7 @@
 {
   "aggregate_psnr_db": 19.262859151206477,
   "artifact": "endoeval_evaluation_receipt",
-  "artifact_sha256": "98c5cab62a722b4e01d518435426f2d30b777e132dce94ebacd16aad344abad8",
+  "artifact_sha256": "299ad48812a2d2ed493dab454cc180477f2674f36e6245909710f71fc2a771e1",
   "authority_sha256": "23f684c2726d8c8800a032044b6e0accf4b55fbb513855b247286968ee756768",
   "measurement": {
     "frame_population_sha256": "48bb47c140e495e4d04877f3836c7380a2de034b1fd6d9222eeb78845f9abf55",
@@ -16,17 +16,17 @@
   "method": {
     "name": "surgicalgaussian",
     "source_commit": "c0ac51a",
-    "version": "official_code_retrain_iter3000"
+    "version": "official_code_retrain_iter40000"
   },
   "outputs": {
     "admission.json": "4155c682ec64f0cda6743f92a70d8b53fd7ac22b5e6b536030bc55da008d1e91",
-    "metrics.json": "9f6f0b475ba1881e0a9eb961833f471b3bc33d96a74d81471e6b16be14c407ad",
+    "metrics.json": "583dc5bfc47ba14a95452c75802ee33f37d87642a08ac536a0951a3f8bffcc3f",
     "paper_table.csv": "7b2fd96f48fb6ab3e75384658a1009ad1f78fb698c7625667493552d91e05251"
   },
   "prediction_set_sha256": "419d3c6ee79b99ec4e5f44f5ebee696e58d3133b8119273e8848c4a2d56168dd",
   "profile_id": "endonerf-rgb-v1",
   "profile_sha256": "37e3dae14f181296b0d795e90865d74e5ea12a352acc5ce1543cd30213643869",
-  "receipt_sha256": "c0364c4b1263109737bbfcbebb8fb9825d69d8e10e9d74e0bb78e43b5ad2f265",
+  "receipt_sha256": "5dee0cd9cd462d8ea49fd769a243a0543e923c9ce28aa5f7054b2ecacabbc315",
   "schema_version": 1,
-  "submission_sha256": "8bbafe7b8b2b09eea643f2967c702ffa2bca1f6c07c5f6a64c7f19978c93a486"
+  "submission_sha256": "723d6e7d14cf40e93f770f23774b39f5ed77ee693eba8dbeabdfaad1fd02c78c"
 }
