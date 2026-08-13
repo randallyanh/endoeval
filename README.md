@@ -1,93 +1,133 @@
-# EndoEval — Private Product Foundation
+# EndoEval — Private Reference Evaluator
 
-**EndoEval** is a profile-driven evaluation tool for dynamic endoscopic reconstruction.
+EndoEval evaluates rendered RGB outputs from dynamic endoscopic reconstruction methods under a versioned, inspectable measurement profile.
 
-Its intended author workflow is:
+The repository is organised around one author workflow:
 
 ```text
 render predictions
-→ choose one versioned evaluation profile
-→ run one command
-→ receive canonical metrics, a paper table, a measurement receipt, and an admission decision
+→ validate the expected frames
+→ score one frozen profile
+→ receive metrics, a paper table, a receipt, and a claim boundary
 ```
 
-This repository is private pre-release work. It is not yet an open-source release, an official challenge evaluator, or an established community standard.
+It is private pre-release work. It is not yet an open-source release, an official challenge evaluator, or a community standard. Adoption as a field default is tracked separately from the quality and completeness of this implementation.
 
-## Quick start
+## Install
+
+Python 3.13 is the verified baseline.
 
 ```bash
-python -I -S -B endoeval.py profiles
-python -I -S -B endoeval.py profile endonerf-rgb-v1
-python -I -S -B endoeval.py validate examples/minimal-submission/submission.json
-python -I -S -B endoeval.py evaluate examples/minimal-submission/submission.json
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.lock
+python -m pip install --no-build-isolation --no-deps -e .
 ```
 
-The first three commands work in the private foundation. `evaluate` currently exits with a machine-readable `blocked` disposition because the final EndoNeRF frame/support authorities and the maintained RGB/mask-to-statistics adapter are not yet frozen. It never fabricates a score.
+## Evaluate a method
 
-## Why method authors should use it
+Create a submission without changing training code:
 
-- **Output-first:** normal integration supplies rendered outputs; it does not modify training code.
-- **Method-agnostic:** NeRF, 3DGS/4DGS, diffusion-assisted, and future representations use the same submission contract.
-- **Versioned:** a profile change creates a new profile ID instead of silently changing old scores.
-- **Paper-ready:** a completed evaluation will produce exactly four outputs:
+```bash
+endoeval init my-submission \
+  --profile endonerf-rgb-v1 \
+  --method my-method \
+  --method-version paper-submission
+```
+
+Copy one RGB PNG for every name in the generated `EXPECTED_FRAMES.txt` files, then run:
+
+```bash
+endoeval validate my-submission/submission.json --check-paths
+
+endoeval evaluate my-submission/submission.json \
+  --dataset-root /path/to/EndoNeRF \
+  --output my-submission/endoeval-output
+```
+
+A completed evaluation writes exactly:
 
 ```text
 metrics.json
-evaluation_receipt.json
 paper_table.csv
+evaluation_receipt.json
 admission.json
 ```
 
-- **Reviewable:** the receipt records the cases, evaluation region, metric convention, reduction, and artifact/source identities needed to interpret a comparison.
+Verify the result without re-running the model:
 
-## Direct users
-
-1. **Method authors** want a zero-training-change path from renders to paper-ready results.
-2. **Paper reviewers** want to verify a receipt and see the strongest comparison claim the evidence supports.
-3. **Challenge organisers** want immutable profiles and benchmark-owned rescoring rules.
-4. **Maintainers** want a small, licensed, provenance-bound release surface.
-
-Clinical and translational readers are served primarily by the paper and workshop presentation. This CLI is not a clinical product.
-
-## Repository structure
-
-```text
-endoeval.py                    user-facing command
-src/endoeval/                  profile and submission contract
-profiles/                      versioned evaluation profiles
-examples/                      method-independent submission example
-src/benchmark_integrity/       numerical and claim-admission kernel
-tests/                         exactly three focused test files
+```bash
+endoeval verify my-submission/endoeval-output/evaluation_receipt.json
 ```
 
-The Paper 3 reproducibility capsule remains a separate evidence surface while this product foundation is reviewed. It will be imported later under a bounded `paper3/` path rather than defining the root user experience.
+Compare two verified outputs:
+
+```bash
+endoeval compare \
+  method-a/endoeval-output/evaluation_receipt.json \
+  method-b/endoeval-output/evaluation_receipt.json \
+  --claim ordering
+```
 
 ## Current profile
 
-`endonerf-rgb-v1` fixes the intended dynamic-endoscopic RGB task, two EndoNeRF scenes, the output-directory contract, the measurement fields that must be closed, and the four output artifacts. Its status is currently `draft_not_scoreable`.
+`endonerf-rgb-v1` is a scoreable RGB profile with:
 
-## Default-tool adoption gates
+- EndoNeRF `cutting` and `pulling` scenes;
+- 28 frozen dataset-native evaluation frames;
+- 640×512 RGB inputs;
+- dataset-valid, non-tool tissue support;
+- PSNR with epsilon `1e-10`, true-exclusion denominator;
+- unweighted frame mean and equal scene weight.
 
-EndoEval will be called the field default only after all of the following are observed:
+The profile verifies the reference image, tool mask, and invalid-region mask bytes before scoring. Prediction files are method-owned and are bound into the evaluation receipt.
 
-- a new method connects in **10 minutes or less**;
-- normal integration changes **zero training-code lines**;
-- one NeRF, one 3DGS/4DGS, and one independently owned new method use the same evaluator path without method-specific branches;
-- one command produces all four outputs with no hand-edited paper numbers;
-- an external author uses it in a submission or revision;
-- a reviewer verifies a receipt;
-- a challenge organiser accepts or pilots the profile.
+## Claim boundary
 
-Until then it is a **candidate default/reference evaluator**.
+EndoEval directly supports:
 
-## Test boundary
+- a scalar score under one identified measurement;
+- an ordering between two fixed output sets when their measurement identities are equal.
 
-The repository keeps exactly three test files:
+An output-only evaluation does not establish training equivalence, method capability, clinical utility, or state of the art. `admission.json` and `endoeval compare` make that boundary explicit.
+
+## Structure
 
 ```text
-test_user_workflow.py
-test_kernel_conformance.py
-test_profile_integrity.py
+endoeval.py                         source-checkout entry
+src/endoeval/cli.py                 user commands only
+src/endoeval/contracts.py           profiles and submissions
+src/endoeval/scoring.py             image scoring and four outputs
+src/endoeval/receipts.py            offline verification and comparison
+src/endoeval/image_stats.py         RGB/mask → sufficient statistics
+src/endoeval/profiles/              versioned profile and authority
+src/benchmark_integrity/            numerical and claim-admission kernel
+release/SOURCE_REFS.json            exact upstream/source provenance
+examples/                           method-independent submission example
+tests/                              three necessary integration boundaries
 ```
 
-New cases extend these files. There is no hosted CI policy, coverage threshold, mutation framework, gate registry, or proof plane.
+## Direct users
+
+- Method authors: one output contract and paper-ready results.
+- Reviewers: verify a receipt and inspect the strongest supported claim.
+- Challenge organisers: reuse immutable profiles and organiser-owned rescoring.
+- Maintainers: preserve source, profile, dataset, and licence boundaries.
+
+Clinical and translational readers are served primarily by the paper and workshop presentation; this command-line evaluator is not a clinical product.
+
+## Tests
+
+The test surface is deliberately small:
+
+```bash
+python -B -m unittest discover -s tests -v
+```
+
+It contains exactly three top-level tests:
+
+1. the full author workflow (`init → validate → evaluate → verify → compare`);
+2. the load-bearing numerical and claim-admission boundary;
+3. the bundled profile and unsafe-input boundary.
+
+There is no coverage gate, mutation framework, hosted CI policy, benchmark server, database, GUI, plugin framework, or proof plane.

@@ -1,34 +1,44 @@
 {
   "artifact": "endoeval_private_source_refs",
-  "schema_version": 1,
-  "status": "private_product_foundation_not_release",
   "files": {
     "src/benchmark_integrity/comparability.py": {
-      "source_repository": "randallyanh/GP4DGS",
-      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
-      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
       "git_blob_sha1": "1bae061fbdfb5ede2afcef8d5ac8e45bc31d8f3d",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
       "transformation": "none"
     },
     "src/benchmark_integrity/metric_conventions.py": {
-      "source_repository": "randallyanh/GP4DGS",
-      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
-      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
       "git_blob_sha1": "a358f46c57d323938d0b8190519d68a12ba36a72",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
       "transformation": "none"
     },
     "src/benchmark_integrity/region_error.py": {
-      "source_repository": "randallyanh/GP4DGS",
-      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
-      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
       "git_blob_sha1": "e507b3183a74e0296aea9916bdb2b54831a4e562",
+      "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
+      "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
+      "source_repository": "randallyanh/GP4DGS",
       "transformation": "none"
+    },
+    "src/endoeval/image_stats.py": {
+      "source_path": "packages/surg-reveal-eval/src/surg_reveal_eval/metrics.py",
+      "source_ref": "6cb2d4326adbd695893d37ff1a66ed4efa6f3ba6",
+      "source_repository": "randallyanh/GP4DGS",
+      "transformation": "minimal extraction of region_error_source_stats and its array-validation helpers"
+    },
+    "src/endoeval/profiles/endonerf-rgb-v1-authority.json": {
+      "source_paths": [
+        "results/paper3_row_inventory.json",
+        "results/paper3_canonical_mask.json",
+        "paper/paper3_sensitivity_plan.json"
+      ],
+      "source_ref": "5a6e653518a79fba73b456a620d009a2ef509264",
+      "source_repository": "randallyanh/GP4DGS",
+      "transformation": "derived versioned profile authority; no score values are consumed"
     }
   },
-  "pending": [
-    "#103 final public conformance vectors and independent oracle",
-    "#115 final image-to-statistics adapter",
-    "canonical EndoNeRF frame/support authorities",
-    "licence and public-disclosure decisions"
-  ]
+  "schema_version": 2,
+  "status": "private_reference_evaluator_not_release"
 }
