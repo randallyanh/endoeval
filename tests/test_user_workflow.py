@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import subprocess
 import sys
@@ -18,6 +19,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CLI = [sys.executable, "-B", str(REPO_ROOT / "endoeval.py")]
 SCENES = (("a", "scene_a"), ("b", "scene_b"))
 OUTPUT_ARTIFACTS = {"metrics.json", "evaluation_receipt.json", "paper_table.csv", "admission.json"}
+
+# The numerical lock. The kernel is repo-owned rather than provenance-frozen,
+# so these pinned scores are what holds the measurement still: a perfect
+# prediction scores the eps-capped 100 dB, and a uniform +5/255 shift scores
+# -10 * log10((5/255)^2 + 1e-10).
+PERFECT_PSNR_DB = 100.0
+SHIFTED_PSNR_DB = 34.151402392358925
 
 
 def _file_sha256(path: Path) -> str:
@@ -51,6 +59,12 @@ class UserWorkflowTests(unittest.TestCase):
             )
             self.assertEqual(comparison["disposition"], "identical")
             self.assertEqual(comparison["artifact_ordering"], "perfect > shifted")
+            self.assertTrue(
+                math.isclose(comparison["left_psnr_db"], PERFECT_PSNR_DB, rel_tol=0, abs_tol=1e-9)
+            )
+            self.assertTrue(
+                math.isclose(comparison["right_psnr_db"], SHIFTED_PSNR_DB, rel_tol=0, abs_tol=1e-9)
+            )
 
             metrics = receipts[0].parent / "metrics.json"
             metrics.write_text(metrics.read_text() + "\n")

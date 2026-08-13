@@ -111,7 +111,6 @@ src/endoeval/receipts.py            offline verification and comparison
 src/endoeval/image_stats.py         RGB/mask → sufficient statistics
 src/endoeval/profiles/              versioned profile and authority
 src/benchmark_integrity/            numerical and claim-admission kernel
-release/SOURCE_REFS.json            exact upstream/source provenance
 examples/                           method-independent submission example
 tests/                              three necessary integration boundaries
 ```

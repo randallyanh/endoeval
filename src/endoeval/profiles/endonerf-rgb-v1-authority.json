@@ -224,14 +224,7 @@
   ],
   "schema_version": 1,
   "source": {
-    "interpretation": "Frozen frame and dataset-owned support authority; no method scores participate in this profile definition.",
-    "records": [
-      "results/paper3_row_inventory.json",
-      "results/paper3_canonical_mask.json",
-      "paper/paper3_sensitivity_plan.json"
-    ],
-    "ref": "5a6e653518a79fba73b456a620d009a2ef509264",
-    "repository": "randallyanh/GP4DGS"
+    "interpretation": "Frozen frame and dataset-owned support authority; no method scores participate in this profile definition. Derived from author-curated frame inventory and mask records fixed before any cross-method comparison."
   },
   "support": {
     "definition": "not(tool_mask > 0.5) AND not(invalid_mask > 0.5)",
