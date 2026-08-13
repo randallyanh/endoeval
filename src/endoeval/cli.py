@@ -32,7 +32,7 @@ def _profiles_command(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _profile_command(args: argparse.Namespace) -> dict[str, Any]:
-    profile = load_profile(args.profile_id)
+    profile, _ = load_profile(args.profile_id)
     authority, authority_path = load_authority(profile)
     return {
         "artifact": "endoeval_profile_summary",
@@ -51,7 +51,7 @@ def _profile_command(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _init_command(args: argparse.Namespace) -> dict[str, Any]:
-    profile = load_profile(args.profile)
+    profile, _ = load_profile(args.profile)
     authority, _ = load_authority(profile)
     destination = args.directory.expanduser().resolve()
     if destination.exists() and any(destination.iterdir()):
@@ -99,9 +99,9 @@ def _validate_command(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "artifact": "endoeval_submission_validation",
         "status": "valid",
-        "profile": validated["profile"]["profile_id"],
-        "method": validated["document"]["method"]["name"],
-        "scenes": [scene["scene"] for scene in validated["scenes"]],
+        "profile": validated.profile["profile_id"],
+        "method": validated.document["method"]["name"],
+        "scenes": [binding.scene for binding in validated.scenes],
         "filesystem_checked": args.check_paths,
         "prediction_files": files,
     }
