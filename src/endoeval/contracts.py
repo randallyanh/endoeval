@@ -128,7 +128,41 @@ def load_profile(profile_id: str) -> tuple[dict[str, Any], Path]:
     return profile, path
 
 
-def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
+@dataclass(frozen=True)
+class AuthorityFrame:
+    """One frozen evaluation frame and the byte identities that define it."""
+
+    frame_id: str
+    native_frame_id: int
+    reference_sha256: str
+    tool_mask_sha256: str
+    invalid_mask_sha256: str
+
+
+@dataclass(frozen=True)
+class AuthorityScene:
+    """One scene's dataset binding and its frozen frame population."""
+
+    scene: str
+    dataset_scene: str
+    reference_template: str
+    tool_mask_template: str
+    invalid_mask_template: str
+    frames: tuple[AuthorityFrame, ...]
+
+
+@dataclass(frozen=True)
+class DatasetAuthority:
+    """A profile's frozen dataset facts: dimensions, support, and frames."""
+
+    dataset_release: str
+    dimensions_wh: tuple[int, int]
+    support_definition: str
+    support_threshold: float
+    scenes: tuple[AuthorityScene, ...]
+
+
+def load_authority(profile: dict[str, Any]) -> tuple[DatasetAuthority, Path]:
     """Load a profile's frozen dataset authority together with its file."""
 
     profile_id = profile["profile_id"]
@@ -167,12 +201,12 @@ def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
         "threshold": 0.5,
     }:
         raise EndoEvalError("authority support definition moved")
-    scenes = authority["scenes"]
-    if not isinstance(scenes, list) or not scenes:
+    raw_scenes = authority["scenes"]
+    if not isinstance(raw_scenes, list) or not raw_scenes:
         raise EndoEvalError("authority.scenes must be a non-empty array")
     seen_scenes: set[str] = set()
-    total_frames = 0
-    for scene_index, raw_scene in enumerate(scenes):
+    scenes: list[AuthorityScene] = []
+    for scene_index, raw_scene in enumerate(raw_scenes):
         scene = _require_exact_keys(
             raw_scene,
             {
@@ -191,11 +225,12 @@ def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
         seen_scenes.add(scene_name)
         for field in ("dataset_scene", "reference_template", "tool_mask_template", "invalid_mask_template"):
             safe_relative_path(scene[field], field=f"authority.{scene_name}.{field}")
-        frames = scene["frames"]
-        if not isinstance(frames, list) or not frames:
+        raw_frames = scene["frames"]
+        if not isinstance(raw_frames, list) or not raw_frames:
             raise EndoEvalError(f"authority scene {scene_name} has no frames")
         seen_frames: set[str] = set()
-        for frame_index, raw_frame in enumerate(frames):
+        frames: list[AuthorityFrame] = []
+        for frame_index, raw_frame in enumerate(raw_frames):
             frame = _require_exact_keys(
                 raw_frame,
                 {
@@ -217,10 +252,35 @@ def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
                 raise EndoEvalError(f"native_frame_id differs from frame_id in {scene_name}/{frame_id}")
             for digest_field in ("reference_sha256", "tool_mask_sha256", "invalid_mask_sha256"):
                 _require_sha256(frame[digest_field], field=f"{scene_name}/{frame_id}/{digest_field}")
-        total_frames += len(frames)
-    if total_frames <= 0:
-        raise EndoEvalError("authority has no frames")
-    return authority, path
+            frames.append(
+                AuthorityFrame(
+                    frame_id=frame_id,
+                    native_frame_id=frame["native_frame_id"],
+                    reference_sha256=frame["reference_sha256"],
+                    tool_mask_sha256=frame["tool_mask_sha256"],
+                    invalid_mask_sha256=frame["invalid_mask_sha256"],
+                )
+            )
+        scenes.append(
+            AuthorityScene(
+                scene=scene_name,
+                dataset_scene=scene["dataset_scene"],
+                reference_template=scene["reference_template"],
+                tool_mask_template=scene["tool_mask_template"],
+                invalid_mask_template=scene["invalid_mask_template"],
+                frames=tuple(frames),
+            )
+        )
+    return (
+        DatasetAuthority(
+            dataset_release=authority["dataset_release"],
+            dimensions_wh=(dimensions[0], dimensions[1]),
+            support_definition=support["definition"],
+            support_threshold=support["threshold"],
+            scenes=tuple(scenes),
+        ),
+        path,
+    )
 
 
 def list_profiles() -> list[dict[str, Any]]:
@@ -239,8 +299,8 @@ def list_profiles() -> list[dict[str, Any]]:
                 "status": profile["status"],
                 "dataset": profile["dataset"]["name"],
                 "task": profile["task"],
-                "scenes": len(authority["scenes"]),
-                "frames": sum(len(scene["frames"]) for scene in authority["scenes"]),
+                "scenes": len(authority.scenes),
+                "frames": sum(len(scene.frames) for scene in authority.scenes),
             }
         )
     if not profiles:
@@ -264,7 +324,7 @@ class ValidatedSubmission:
     document: dict[str, Any]
     profile: dict[str, Any]
     profile_path: Path
-    authority: dict[str, Any]
+    authority: DatasetAuthority
     authority_path: Path
     scenes: tuple[SceneBinding, ...]
 
@@ -300,7 +360,7 @@ def validate_submission(submission_path: Path) -> ValidatedSubmission:
     raw_scenes = submission["scenes"]
     if not isinstance(raw_scenes, list) or not raw_scenes:
         raise EndoEvalError("submission.scenes must be a non-empty array")
-    expected = {scene["scene"] for scene in authority["scenes"]}
+    expected = {scene.scene for scene in authority.scenes}
     seen: set[str] = set()
     bindings: list[SceneBinding] = []
     for index, raw_scene in enumerate(raw_scenes):
@@ -329,15 +389,17 @@ def validate_submission(submission_path: Path) -> ValidatedSubmission:
     )
 
 
-def expected_prediction_files(authority_scene: dict[str, Any]) -> set[str]:
-    return {f"{frame['frame_id']}.png" for frame in authority_scene["frames"]}
+def expected_prediction_files(authority_scene: AuthorityScene) -> set[str]:
+    """Name the prediction files a scene's frozen frames require."""
+
+    return {f"{frame.frame_id}.png" for frame in authority_scene.frames}
 
 
 def validate_prediction_directories(validated: ValidatedSubmission) -> dict[str, list[str]]:
     """Require every bound prediction directory to hold exactly the expected frames."""
 
     base = validated.path.parent
-    authority_by_scene = {scene["scene"]: scene for scene in validated.authority["scenes"]}
+    authority_by_scene = {scene.scene: scene for scene in validated.authority.scenes}
     result: dict[str, list[str]] = {}
     for binding in validated.scenes:
         directory = resolve_inside(base, binding.predictions, field=f"predictions[{binding.scene}]")
@@ -355,6 +417,9 @@ def validate_prediction_directories(validated: ValidatedSubmission) -> dict[str,
 
 
 __all__ = [
+    "AuthorityFrame",
+    "AuthorityScene",
+    "DatasetAuthority",
     "OUTPUT_ARTIFACTS",
     "SceneBinding",
     "ValidatedSubmission",

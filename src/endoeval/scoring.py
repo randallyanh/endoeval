@@ -28,6 +28,9 @@ from endoeval.canonical import (
     write_json,
 )
 from endoeval.contracts import (
+    AuthorityFrame,
+    AuthorityScene,
+    DatasetAuthority,
     OUTPUT_ARTIFACTS,
     validate_prediction_directories,
     validate_submission,
@@ -91,19 +94,21 @@ def _load_mask(path: Path) -> np.ndarray:
 
 def _format_dataset_path(
     dataset_root: Path,
-    scene: dict[str, Any],
-    template_field: str,
-    frame: dict[str, Any],
+    template: str,
+    *,
+    role: str,
+    scene: AuthorityScene,
+    frame: AuthorityFrame,
 ) -> Path:
     try:
-        relative = scene[template_field].format(
-            dataset_scene=scene["dataset_scene"],
-            frame_id=frame["frame_id"],
-            native_frame_id=frame["native_frame_id"],
+        relative = template.format(
+            dataset_scene=scene.dataset_scene,
+            frame_id=frame.frame_id,
+            native_frame_id=frame.native_frame_id,
         )
-    except (KeyError, ValueError) as exc:
-        raise EndoEvalError(f"invalid authority template {template_field}: {exc}") from exc
-    return resolve_inside(dataset_root, relative, field=f"authority.{template_field}")
+    except (IndexError, KeyError, ValueError) as exc:
+        raise EndoEvalError(f"invalid authority template {role}: {exc}") from exc
+    return resolve_inside(dataset_root, relative, field=f"authority.{role}")
 
 
 def _require_file(path: Path, expected_sha256: str, *, role: str) -> None:
@@ -149,78 +154,79 @@ def _require_scoreable(score: PsnrDenominatorResult, *, subject: str) -> float:
 
 
 def _score_frame(
-    authority_scene: dict[str, Any],
-    frame: dict[str, Any],
+    scene: AuthorityScene,
+    frame: AuthorityFrame,
     *,
     prediction_dir: Path,
     dataset_root: Path,
-    dimensions_wh: tuple[int, int],
-    support_threshold: float,
+    authority: DatasetAuthority,
 ) -> FrameMeasurement:
     """Measure one frame against its byte-verified reference and support."""
 
-    scene_name = authority_scene["scene"]
-    frame_id = frame["frame_id"]
-    prediction_path = prediction_dir / f"{frame_id}.png"
-    reference_path = _format_dataset_path(dataset_root, authority_scene, "reference_template", frame)
-    tool_mask_path = _format_dataset_path(dataset_root, authority_scene, "tool_mask_template", frame)
-    invalid_mask_path = _format_dataset_path(dataset_root, authority_scene, "invalid_mask_template", frame)
-    _require_file(reference_path, frame["reference_sha256"], role="reference image")
-    _require_file(tool_mask_path, frame["tool_mask_sha256"], role="tool mask")
-    _require_file(invalid_mask_path, frame["invalid_mask_sha256"], role="invalid-region mask")
+    prediction_path = prediction_dir / f"{frame.frame_id}.png"
+    reference_path = _format_dataset_path(
+        dataset_root, scene.reference_template, role="reference_template", scene=scene, frame=frame
+    )
+    tool_mask_path = _format_dataset_path(
+        dataset_root, scene.tool_mask_template, role="tool_mask_template", scene=scene, frame=frame
+    )
+    invalid_mask_path = _format_dataset_path(
+        dataset_root, scene.invalid_mask_template, role="invalid_mask_template", scene=scene, frame=frame
+    )
+    _require_file(reference_path, frame.reference_sha256, role="reference image")
+    _require_file(tool_mask_path, frame.tool_mask_sha256, role="tool mask")
+    _require_file(invalid_mask_path, frame.invalid_mask_sha256, role="invalid-region mask")
 
     prediction = _load_rgb(prediction_path)
     reference = _load_rgb(reference_path)
     tool_mask = _load_mask(tool_mask_path)
     invalid_mask = _load_mask(invalid_mask_path)
-    if (prediction.shape[1], prediction.shape[0]) != dimensions_wh:
+    width, height = authority.dimensions_wh
+    if (prediction.shape[1], prediction.shape[0]) != authority.dimensions_wh:
         raise EndoEvalError(
-            f"prediction {scene_name}/{frame_id} has dimensions "
-            f"{prediction.shape[1]}x{prediction.shape[0]}, expected "
-            f"{dimensions_wh[0]}x{dimensions_wh[1]}"
+            f"prediction {scene.scene}/{frame.frame_id} has dimensions "
+            f"{prediction.shape[1]}x{prediction.shape[0]}, expected {width}x{height}"
         )
     if reference.shape != prediction.shape:
-        raise EndoEvalError(f"reference and prediction shapes differ for {scene_name}/{frame_id}")
+        raise EndoEvalError(f"reference and prediction shapes differ for {scene.scene}/{frame.frame_id}")
+    threshold = authority.support_threshold
     try:
-        support = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
+        support = (tool_mask <= threshold) & (invalid_mask <= threshold)
         stats = region_error_source_stats(prediction, reference, support)
         score = compare_psnr_denominators(stats, convention=FINITE_PSNR_CONVENTION)
     except ValueError as exc:
-        raise EndoEvalError(f"cannot score {scene_name}/{frame_id}: {exc}") from exc
+        raise EndoEvalError(f"cannot score {scene.scene}/{frame.frame_id}: {exc}") from exc
     return FrameMeasurement(
-        scene=scene_name,
-        frame_id=frame_id,
-        native_frame_id=frame["native_frame_id"],
+        scene=scene.scene,
+        frame_id=frame.frame_id,
+        native_frame_id=frame.native_frame_id,
         stats=stats,
-        psnr_db=_require_scoreable(score, subject=f"{scene_name}/{frame_id}"),
+        psnr_db=_require_scoreable(score, subject=f"{scene.scene}/{frame.frame_id}"),
         prediction_sha256=file_sha256(prediction_path),
-        reference_sha256=frame["reference_sha256"],
+        reference_sha256=frame.reference_sha256,
         support_sha256=bytes_sha256(np.ascontiguousarray(support, dtype=np.uint8).tobytes()),
     )
 
 
 def _score_scene(
-    authority_scene: dict[str, Any],
+    scene: AuthorityScene,
     *,
     prediction_dir: Path,
     prediction_files: Sequence[str],
     dataset_root: Path,
-    dimensions_wh: tuple[int, int],
-    support_threshold: float,
+    authority: DatasetAuthority,
 ) -> SceneMeasurement:
     """Measure one scene as the unweighted mean over its frozen frames."""
 
-    scene_name = authority_scene["scene"]
     frames = tuple(
         _score_frame(
-            authority_scene,
+            scene,
             frame,
             prediction_dir=prediction_dir,
             dataset_root=dataset_root,
-            dimensions_wh=dimensions_wh,
-            support_threshold=support_threshold,
+            authority=authority,
         )
-        for frame in authority_scene["frames"]
+        for frame in scene.frames
     )
     try:
         score = aggregate_region_errors(
@@ -229,10 +235,10 @@ def _score_scene(
             convention=FINITE_PSNR_CONVENTION,
         )
     except ValueError as exc:
-        raise EndoEvalError(f"cannot aggregate scene {scene_name}: {exc}") from exc
+        raise EndoEvalError(f"cannot aggregate scene {scene.scene}: {exc}") from exc
     return SceneMeasurement(
-        scene=scene_name,
-        psnr_db=_require_scoreable(score, subject=f"scene {scene_name}"),
+        scene=scene.scene,
+        psnr_db=_require_scoreable(score, subject=f"scene {scene.scene}"),
         frames=frames,
         prediction_files=tuple(prediction_files),
     )
@@ -405,23 +411,20 @@ def evaluate(
     _prepare_output_directory(output_dir, overwrite=overwrite)
 
     authority = validated.authority
-    dimensions_wh = tuple(authority["dimensions_wh"])
-    support_threshold = authority["support"]["threshold"]
     bindings = {binding.scene: binding for binding in validated.scenes}
     scenes = [
         _score_scene(
             authority_scene,
             prediction_dir=resolve_inside(
                 validated.path.parent,
-                bindings[authority_scene["scene"]].predictions,
-                field=f"predictions[{authority_scene['scene']}]",
+                bindings[authority_scene.scene].predictions,
+                field=f"predictions[{authority_scene.scene}]",
             ),
-            prediction_files=prediction_files[authority_scene["scene"]],
+            prediction_files=prediction_files[authority_scene.scene],
             dataset_root=dataset_root,
-            dimensions_wh=dimensions_wh,
-            support_threshold=support_threshold,
+            authority=authority,
         )
-        for authority_scene in authority["scenes"]
+        for authority_scene in authority.scenes
     ]
     aggregate_psnr = math.fsum(scene.psnr_db for scene in scenes) / len(scenes)
 
