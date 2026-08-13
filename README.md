@@ -99,6 +99,8 @@ EndoEval directly supports:
 
 An output-only evaluation does not establish training equivalence, method capability, clinical utility, or state of the art. `admission.json` and `endoeval compare` make that boundary explicit.
 
+`baselines/` holds verified receipts for three public methods' render sets, with the same boundary applied; see `baselines/README.md`.
+
 ## Structure
 
 ```text
@@ -111,6 +113,7 @@ src/endoeval/receipts.py            offline verification and comparison
 src/endoeval/image_stats.py         RGB/mask → sufficient statistics
 src/endoeval/profiles/              versioned profile and authority
 src/benchmark_integrity/            numerical and claim-admission kernel
+baselines/                          verified receipts for public baseline render sets
 examples/                           method-independent submission example
 tests/                              three necessary integration boundaries
 ```

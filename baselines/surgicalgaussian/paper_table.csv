@@ -1,0 +1,4 @@
+profile,method,scene,psnr_db,n_frames
+endonerf-rgb-v1,surgicalgaussian,cutting,19.797834,20
+endonerf-rgb-v1,surgicalgaussian,pulling,18.727885,8
+endonerf-rgb-v1,surgicalgaussian,equal_scene_mean,19.262859,28
