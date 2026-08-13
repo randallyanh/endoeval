@@ -9,15 +9,14 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, TextIO
 
+from endoeval.canonical import EndoEvalError, write_json
 from endoeval.contracts import (
-    EndoEvalError,
     expected_prediction_files,
     list_profiles,
     load_authority,
     load_profile,
     validate_prediction_directories,
     validate_submission,
-    write_json,
 )
 from endoeval.receipts import compare_receipts, verify_receipt
 from endoeval.scoring import evaluate

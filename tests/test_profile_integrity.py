@@ -2,7 +2,8 @@ from __future__ import annotations
 import sys,unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT/'src'))
-from endoeval.contracts import EndoEvalError,load_authority,load_profile,safe_relative_path
+from endoeval.canonical import EndoEvalError,safe_relative_path
+from endoeval.contracts import load_authority,load_profile
 
 class ProfileIntegrityTests(unittest.TestCase):
     def test_bundled_profile_and_input_boundary(self):

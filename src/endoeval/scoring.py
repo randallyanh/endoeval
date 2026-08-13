@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -20,15 +19,18 @@ from benchmark_integrity.region_error import (
     aggregate_region_errors,
     compare_psnr_denominators,
 )
-from endoeval.contracts import (
+from endoeval.canonical import (
     EndoEvalError,
-    OUTPUT_ARTIFACTS,
+    bytes_sha256,
     canonical_sha256,
     file_sha256,
     resolve_inside,
+    write_json,
+)
+from endoeval.contracts import (
+    OUTPUT_ARTIFACTS,
     validate_prediction_directories,
     validate_submission,
-    write_json,
 )
 from endoeval.image_stats import region_error_source_stats
 
@@ -193,9 +195,7 @@ def _score_frame(
         psnr_db=_require_scoreable(score, subject=f"{scene_name}/{frame_id}"),
         prediction_sha256=file_sha256(prediction_path),
         reference_sha256=frame["reference_sha256"],
-        support_sha256=hashlib.sha256(
-            np.ascontiguousarray(support, dtype=np.uint8).tobytes()
-        ).hexdigest(),
+        support_sha256=bytes_sha256(np.ascontiguousarray(support, dtype=np.uint8).tobytes()),
     )
 
 

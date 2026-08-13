@@ -1,14 +1,19 @@
-"""Versioned profile and method-independent submission contracts."""
+"""Versioned profile, dataset authority, and submission contracts."""
 
 from __future__ import annotations
 
-import hashlib
-import json
 import os
 import re
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath, PureWindowsPath
+from pathlib import Path
 from typing import Any
+
+from endoeval.canonical import (
+    EndoEvalError,
+    load_json,
+    resolve_inside,
+    safe_relative_path,
+)
 
 _PROFILE_ID = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
@@ -21,98 +26,13 @@ OUTPUT_ARTIFACTS = (
 )
 
 
-class EndoEvalError(ValueError):
-    """A user-visible EndoEval contract or evaluation error."""
-
-
-def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in result:
-            raise EndoEvalError(f"duplicate JSON key: {key!r}")
-        result[key] = value
-    return result
-
-
-def _reject_constant(value: str) -> None:
-    raise EndoEvalError(f"non-finite JSON constant is forbidden: {value}")
-
-
-def load_json(path: Path) -> Any:
-    try:
-        return json.loads(
-            path.read_text(encoding="utf-8"),
-            object_pairs_hook=_reject_duplicate_keys,
-            parse_constant=_reject_constant,
-        )
-    except OSError as exc:
-        raise EndoEvalError(f"cannot read {path}: {exc}") from exc
-    except json.JSONDecodeError as exc:
-        raise EndoEvalError(f"invalid JSON in {path}: {exc}") from exc
-
-
-def canonical_json_bytes(value: object) -> bytes:
-    return json.dumps(
-        value,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=False,
-        allow_nan=False,
-    ).encode("utf-8")
-
-
-def canonical_sha256(value: object) -> str:
-    return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
-
-
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    try:
-        with path.open("rb") as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(block)
-    except OSError as exc:
-        raise EndoEvalError(f"cannot read {path}: {exc}") from exc
-    return digest.hexdigest()
-
-
-def write_json(path: Path, value: object) -> None:
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n",
-        encoding="utf-8",
-    )
-
-
 def profile_root() -> Path:
+    """Locate the installed profiles, honouring ENDOEVAL_PROFILE_ROOT."""
+
     override = os.environ.get("ENDOEVAL_PROFILE_ROOT")
     if override:
         return Path(override).expanduser().resolve()
     return Path(__file__).resolve().parent / "profiles"
-
-
-def safe_relative_path(value: object, *, field: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise EndoEvalError(f"{field} must be a non-empty relative path")
-    if "\x00" in value or "\\" in value:
-        raise EndoEvalError(f"{field} must use canonical POSIX separators")
-    parts = value.split("/")
-    if any(part in {"", ".", ".."} for part in parts):
-        raise EndoEvalError(f"{field} contains an empty, dot, or parent component")
-    posix = PurePosixPath(value)
-    windows = PureWindowsPath(value)
-    if posix.is_absolute() or windows.is_absolute() or windows.drive:
-        raise EndoEvalError(f"{field} must remain relative")
-    return posix.as_posix()
-
-
-def resolve_inside(base: Path, relative: str, *, field: str) -> Path:
-    root = base.resolve()
-    candidate = (root / safe_relative_path(relative, field=field)).resolve()
-    try:
-        candidate.relative_to(root)
-    except ValueError as exc:
-        raise EndoEvalError(f"{field} escapes its declared root") from exc
-    return candidate
 
 
 def _require_exact_keys(document: object, expected: set[str], *, name: str) -> dict[str, Any]:
@@ -435,21 +355,14 @@ def validate_prediction_directories(validated: ValidatedSubmission) -> dict[str,
 
 
 __all__ = [
-    "EndoEvalError",
     "OUTPUT_ARTIFACTS",
     "SceneBinding",
     "ValidatedSubmission",
-    "canonical_sha256",
     "expected_prediction_files",
-    "file_sha256",
     "list_profiles",
     "load_authority",
-    "load_json",
     "load_profile",
     "profile_root",
-    "resolve_inside",
-    "safe_relative_path",
     "validate_prediction_directories",
     "validate_submission",
-    "write_json",
 ]
