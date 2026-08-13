@@ -6,15 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from benchmark_integrity.comparability import ComparisonFacts, assess_comparability
-from endoeval.contracts import (
-    EndoEvalError,
-    OUTPUT_ARTIFACTS,
-    canonical_sha256,
-    file_sha256,
-    load_authority,
-    load_json,
-    load_profile,
-)
+from endoeval.canonical import EndoEvalError, canonical_sha256, file_sha256, load_json
+from endoeval.contracts import OUTPUT_ARTIFACTS, load_authority, load_profile
 
 _RECEIPT_NAME = "evaluation_receipt.json"
 _HASHED_OUTPUTS = frozenset(OUTPUT_ARTIFACTS) - {_RECEIPT_NAME}
