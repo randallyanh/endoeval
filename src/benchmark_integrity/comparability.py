@@ -1,13 +1,13 @@
-"""Claim-conditioned comparability disposition (issue #94).
+"""Claim-conditioned comparability disposition.
 
 This module decides what a particular *claim* is entitled to conclude from a
 pair of evaluations. It owns no identity, opens no file, and imports nothing
-but the standard library — deliberately, because the open-core boundary frozen
-for #103 forbids the scientific kernel from reaching the comparison, evidence,
+but the standard library — deliberately, because the frozen open-core boundary
+forbids the scientific kernel from reaching the comparison, evidence,
 population, training, resource, claim or closure contract graph.
 
 So it takes projections, not contracts. :class:`ComparisonFacts` and
-:class:`PsnrTransportFacts` record what an upstream adapter (#97) established
+:class:`PsnrTransportFacts` record what an upstream adapter established
 against validated objects, having already opened, rehashed and recomputed
 everything this kernel is not allowed to touch. Two consequences follow, and
 both are enforced rather than documented:
@@ -39,7 +39,7 @@ Precedence is fixed and total, most decisive first:
 
 Exactly two positive non-identical dispositions exist, and only the PSNR
 keep/true-exclusion transform licenses them. Both require the two protocols to
-differ in the denominator ALONE — a fact #97 establishes by diffing the actual
+differ in the denominator ALONE — a fact the adapter establishes by diffing the actual
 protocols, since a resize, compression, data-range, backend or aggregation
 difference is not transportable and must not be waved through by the mere
 presence of a recomputation.
@@ -112,7 +112,7 @@ def _require_gap_db(value: object, *, field: str) -> None:
         raise ValueError(f"{field} must be finite")
     if number < 0:
         # keep scores the same squared error over more pixels, so keep never
-        # falls below true exclusion; a negative gap is #95's sign inverted
+        # falls below true exclusion; a negative gap is the canonical sign inverted
         raise ValueError(f"{field} must be non-negative in the canonical keep-minus-true sign")
 
 
@@ -163,10 +163,11 @@ class ComparisonFacts:
 class PsnrTransportFacts:
     """The one transform allowed to license a positive disposition.
 
-    #97 constructs this only after verifying the sidecar's file digest,
-    reading it, parsing the #96 v2 evidence, verifying its contract digest,
-    rebinding the real authorities, recomputing through #95, and diffing the
-    actual protocols to establish that they differ in the denominator alone.
+    The upstream adapter constructs this only after verifying the sidecar's
+    file digest, reading it, parsing the v2 evidence, verifying its contract
+    digest, rebinding the real authorities, recomputing the decomposition, and
+    diffing the actual protocols to establish that they differ in the
+    denominator alone.
     The type confers no trust; it records that those steps were taken and
     refuses values that could not have come from them.
 

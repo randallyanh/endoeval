@@ -2,25 +2,22 @@
   "artifact": "endoeval_private_source_refs",
   "files": {
     "src/benchmark_integrity/comparability.py": {
-      "git_blob_sha1": "1bae061fbdfb5ede2afcef8d5ac8e45bc31d8f3d",
       "source_path": "packages/benchmark-integrity/src/benchmark_integrity/comparability.py",
       "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
       "source_repository": "randallyanh/GP4DGS",
-      "transformation": "none"
+      "transformation": "redaction of source-repository issue references from docstrings and comments; executable code unchanged"
     },
     "src/benchmark_integrity/metric_conventions.py": {
-      "git_blob_sha1": "a358f46c57d323938d0b8190519d68a12ba36a72",
       "source_path": "packages/benchmark-integrity/src/benchmark_integrity/metric_conventions.py",
       "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
       "source_repository": "randallyanh/GP4DGS",
-      "transformation": "none"
+      "transformation": "redaction of source-repository issue references from docstrings and comments; executable code unchanged"
     },
     "src/benchmark_integrity/region_error.py": {
-      "git_blob_sha1": "e507b3183a74e0296aea9916bdb2b54831a4e562",
       "source_path": "packages/benchmark-integrity/src/benchmark_integrity/region_error.py",
       "source_ref": "4879c0f4bb532fa69521815e5cd4a5f73679fcb0",
       "source_repository": "randallyanh/GP4DGS",
-      "transformation": "none"
+      "transformation": "redaction of source-repository issue references from docstrings and comments; executable code unchanged"
     },
     "src/endoeval/image_stats.py": {
       "source_path": "packages/surg-reveal-eval/src/surg_reveal_eval/metrics.py",
