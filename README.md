@@ -82,6 +82,14 @@ endoeval compare \
 
 The profile verifies the reference image, tool mask, and invalid-region mask bytes before scoring. Prediction files are method-owned and are bound into the evaluation receipt.
 
+## Nomenclature
+
+- **prediction** — one method-owned rendered RGB frame under evaluation.
+- **reference** — the dataset-owned ground-truth RGB frame with the same frame id.
+- **support** — the pixel set a score is computed over: dataset-valid, non-tool tissue.
+- **measurement** — the identified scoring configuration a receipt binds: output target, frame population, support, protocol, metric, and reduction.
+- **receipt** — the sealed record binding one prediction set to one measurement and its outputs.
+
 ## Claim boundary
 
 EndoEval directly supports:
@@ -96,8 +104,9 @@ An output-only evaluation does not establish training equivalence, method capabi
 ```text
 endoeval.py                         source-checkout entry
 src/endoeval/cli.py                 user commands only
-src/endoeval/contracts.py           profiles and submissions
-src/endoeval/scoring.py             image scoring and four outputs
+src/endoeval/canonical.py           canonical encoding, digests, path safety
+src/endoeval/contracts.py           profile, authority, and submission contracts
+src/endoeval/scoring.py             frame and scene measurements, four outputs
 src/endoeval/receipts.py            offline verification and comparison
 src/endoeval/image_stats.py         RGB/mask → sufficient statistics
 src/endoeval/profiles/              versioned profile and authority
