@@ -38,12 +38,15 @@ def _profile_command(args: argparse.Namespace) -> dict[str, Any]:
         "profile": profile,
         "authority": {
             "path": str(authority_path),
-            "dataset_release": authority["dataset_release"],
-            "dimensions_wh": authority["dimensions_wh"],
-            "support": authority["support"],
+            "dataset_release": authority.dataset_release,
+            "dimensions_wh": list(authority.dimensions_wh),
+            "support": {
+                "definition": authority.support_definition,
+                "threshold": authority.support_threshold,
+            },
             "scenes": [
-                {"scene": scene["scene"], "frames": len(scene["frames"])}
-                for scene in authority["scenes"]
+                {"scene": scene.scene, "frames": len(scene.frames)}
+                for scene in authority.scenes
             ],
         },
     }
@@ -57,13 +60,13 @@ def _init_command(args: argparse.Namespace) -> dict[str, Any]:
         raise EndoEvalError(f"destination is not empty: {destination}")
     destination.mkdir(parents=True, exist_ok=True)
     scenes = []
-    for scene in authority["scenes"]:
-        relative = f"predictions/{scene['scene']}"
+    for scene in authority.scenes:
+        relative = f"predictions/{scene.scene}"
         directory = destination / relative
         directory.mkdir(parents=True, exist_ok=True)
         expected = sorted(expected_prediction_files(scene))
         (directory / "EXPECTED_FRAMES.txt").write_text("\n".join(expected) + "\n", encoding="utf-8")
-        scenes.append({"scene": scene["scene"], "predictions": relative})
+        scenes.append({"scene": scene.scene, "predictions": relative})
     method: dict[str, str] = {"name": args.method}
     if args.method_version:
         method["version"] = args.method_version

@@ -17,18 +17,22 @@ class ProfileIntegrityTests(unittest.TestCase):
         profile, _ = load_profile("endonerf-rgb-v1")
         authority, _ = load_authority(profile)
         self.assertEqual(profile["status"], "ready")
-        self.assertEqual([len(scene["frames"]) for scene in authority["scenes"]], [20, 8])
-        self.assertEqual(sum(len(scene["frames"]) for scene in authority["scenes"]), 28)
+        self.assertEqual([len(scene.frames) for scene in authority.scenes], [20, 8])
+        self.assertEqual(sum(len(scene.frames) for scene in authority.scenes), 28)
         self.assertEqual(
-            authority["support"]["definition"],
+            authority.support_definition,
             "not(tool_mask > 0.5) AND not(invalid_mask > 0.5)",
         )
-        for scene in authority["scenes"]:
-            frame_ids = {frame["frame_id"] for frame in scene["frames"]}
-            self.assertEqual(len(frame_ids), len(scene["frames"]))
-            for frame in scene["frames"]:
-                for key in ("reference_sha256", "tool_mask_sha256", "invalid_mask_sha256"):
-                    self.assertEqual(len(frame[key]), 64)
+        for scene in authority.scenes:
+            frame_ids = {frame.frame_id for frame in scene.frames}
+            self.assertEqual(len(frame_ids), len(scene.frames))
+            for frame in scene.frames:
+                for digest in (
+                    frame.reference_sha256,
+                    frame.tool_mask_sha256,
+                    frame.invalid_mask_sha256,
+                ):
+                    self.assertEqual(len(digest), 64)
 
         for unsafe in ("../outside", "a\\b", "/absolute", "C:\\outside", "a//b"):
             with self.assertRaises(EndoEvalError):
