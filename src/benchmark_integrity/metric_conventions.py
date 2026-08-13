@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import asdict, dataclass
-from typing import Any
+from dataclasses import dataclass
 
 PSNR_ZERO_POLICY_EPS = "eps"
 PSNR_ZERO_POLICY_INF = "inf"
@@ -43,29 +42,11 @@ class PsnrConvention:
         if self.mean_inf_cap_db is not None and not math.isfinite(float(self.mean_inf_cap_db)):
             raise MetricConventionError("mean_inf_cap_db must be finite when set")
 
-    def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        payload["metric"] = "psnr"
-        if self.zero_policy == PSNR_ZERO_POLICY_EPS:
-            payload["perfect_score_db"] = psnr_from_mse(0.0, convention=self)
-        else:
-            payload["perfect_score_db"] = "inf"
-        return payload
-
 
 FINITE_PSNR_CONVENTION = PsnrConvention(
     name="psnr_mse_eps_1e-10",
     zero_policy=PSNR_ZERO_POLICY_EPS,
     eps=1e-10,
-)
-INFINITE_PSNR_CONVENTION = PsnrConvention(
-    name="psnr_mse_zero_inf",
-    zero_policy=PSNR_ZERO_POLICY_INF,
-)
-ORF_MEAN_PSNR_CONVENTION = PsnrConvention(
-    name="psnr_mse_zero_inf_mean_cap_100db",
-    zero_policy=PSNR_ZERO_POLICY_INF,
-    mean_inf_cap_db=100.0,
 )
 
 
@@ -98,40 +79,13 @@ def psnr_value_for_mean(value: float, *, convention: PsnrConvention) -> float:
     return score
 
 
-def psnr_convention_payload(convention: PsnrConvention) -> dict[str, Any]:
-    return convention.to_dict()
-
-
-@dataclass(frozen=True)
-class RecordState:
-    """The status and ``n`` one metric record is sealed with, and nothing else."""
-
-    status: str
-    n: int | None
-
-
-def frame_record_state(*, finite: bool) -> RecordState:
-    """A frame record is valid exactly when its scalar is finite.
-
-    ``n`` counts what was averaged, and a frame record averages nothing, so it
-    never carries one.
-
-    Stated here rather than in the engine that writes records and again in the
-    replay that predicts them. Two statements of one rule can
-    drift, and the weaker one then decides what a resealed package gets away
-    with. The record's METADATA is not this rule: it annotates why, and only
-    the writer has that.
-    """
-
-    return RecordState("valid", None) if finite else RecordState("not_applicable", None)
-
-
-def bundle_record_state(*, valid_frames: int, complete: bool) -> RecordState:
-    """A bundle record is valid exactly when every frame it averages is.
-
-    ``complete`` is the writer's own condition - some frames, none of them
-    invalid. A bundle that dropped the invalid frames and averaged the rest
-    would report a number for a population it did not measure.
-    """
-
-    return RecordState("valid", valid_frames) if complete else RecordState("not_available", None)
+__all__ = [
+    "FINITE_PSNR_CONVENTION",
+    "MetricConventionError",
+    "PSNR_ZERO_POLICIES",
+    "PSNR_ZERO_POLICY_EPS",
+    "PSNR_ZERO_POLICY_INF",
+    "PsnrConvention",
+    "psnr_from_mse",
+    "psnr_value_for_mean",
+]
