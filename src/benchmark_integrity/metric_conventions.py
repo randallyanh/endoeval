@@ -117,7 +117,7 @@ def frame_record_state(*, finite: bool) -> RecordState:
     never carries one.
 
     Stated here rather than in the engine that writes records and again in the
-    replay that predicts them (issue #120). Two statements of one rule can
+    replay that predicts them. Two statements of one rule can
     drift, and the weaker one then decides what a resealed package gets away
     with. The record's METADATA is not this rule: it annotates why, and only
     the writer has that.

@@ -1,4 +1,4 @@
-"""Exact masked-PSNR coverage decomposition and score transport (issue #95).
+"""Exact masked-PSNR coverage decomposition and score transport.
 
 One numerical owner for the relation between scoring a selected region with
 its own denominator (``true exclusion``) and scoring the same squared error
