@@ -21,12 +21,12 @@
   "outputs": {
     "admission.json": "4155c682ec64f0cda6743f92a70d8b53fd7ac22b5e6b536030bc55da008d1e91",
     "metrics.json": "6670c3bc414d749830545ccdc36eca7002c32151d5d2e73d229d3ec3832d5171",
-    "paper_table.csv": "1159b93c8776127290896fe14b39d7acc5da52db116c86ed9a440908c6cd0799"
+    "paper_table.csv": "e4d26840bbd3e2625213e37a8d1914aefe86280cb08ee5219350bff4b3f2c8b9"
   },
   "prediction_set_sha256": "e056b5fb464891eb16ee7abc460594dab196be53344b1712cecc91185318b5c6",
   "profile_id": "endonerf-rgb-v1",
   "profile_sha256": "37e3dae14f181296b0d795e90865d74e5ea12a352acc5ce1543cd30213643869",
-  "receipt_sha256": "69e0ab2aa41b3dbadbbc08eda435aae28d527013955f7a5445110302d0a474c7",
+  "receipt_sha256": "6e7d801abc50f1b3f78db98a24df0538a52e139722d5c60a57eb71c8c7f131c7",
   "schema_version": 1,
   "submission_sha256": "455da369ecd59d3ec4d6127ddab3ae91491fbbf7012ac117e56d44833c0c1138"
 }

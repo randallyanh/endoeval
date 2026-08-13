@@ -378,7 +378,10 @@ def _write_paper_table(
 ) -> None:
     total_frames = sum(len(scene.frames) for scene in scenes)
     with path.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.writer(stream)
+        # LF, not the csv default CRLF: receipts pin these bytes, and the
+        # repository normalises text to LF, so CRLF would break a fresh
+        # clone's receipt verification
+        writer = csv.writer(stream, lineterminator="\n")
         writer.writerow(["profile", "method", "scene", "psnr_db", "n_frames"])
         for scene in scenes:
             writer.writerow(
