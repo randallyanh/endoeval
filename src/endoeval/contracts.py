@@ -11,7 +11,8 @@ from typing import Any
 
 _PROFILE_ID = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
-_OUTPUTS = (
+
+OUTPUT_ARTIFACTS = (
     "metrics.json",
     "evaluation_receipt.json",
     "paper_table.csv",
@@ -198,7 +199,7 @@ def load_profile(profile_id: str) -> dict[str, Any]:
         raise EndoEvalError("unsupported frame reduction")
     if measurement["scene_reduction"] != "equal_scene_weight":
         raise EndoEvalError("unsupported scene reduction")
-    if tuple(profile["outputs"]) != _OUTPUTS:
+    if tuple(profile["outputs"]) != OUTPUT_ARTIFACTS:
         raise EndoEvalError("profile output contract moved")
     return profile
 
@@ -402,6 +403,7 @@ def validate_prediction_directories(validated: dict[str, Any]) -> dict[str, list
 
 __all__ = [
     "EndoEvalError",
+    "OUTPUT_ARTIFACTS",
     "canonical_sha256",
     "expected_prediction_files",
     "file_sha256",

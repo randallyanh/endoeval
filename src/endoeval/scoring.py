@@ -15,6 +15,7 @@ from benchmark_integrity.metric_conventions import FINITE_PSNR_CONVENTION
 from benchmark_integrity.region_error import aggregate_region_errors, compare_psnr_denominators
 from endoeval.contracts import (
     EndoEvalError,
+    OUTPUT_ARTIFACTS,
     canonical_sha256,
     file_sha256,
     resolve_inside,
@@ -24,7 +25,7 @@ from endoeval.contracts import (
 )
 from endoeval.image_stats import region_error_source_stats
 
-_OUTPUTS = ("metrics.json", "evaluation_receipt.json", "paper_table.csv", "admission.json")
+_SCOREABLE_STATUSES = frozenset({"complete", "tied_perfect"})
 
 
 def _load_rgb(path: Path) -> np.ndarray:
@@ -75,7 +76,7 @@ def _prepare_output_directory(path: Path, *, overwrite: bool) -> None:
     existing = {item.name for item in path.iterdir()}
     if not existing:
         return
-    unknown = existing - set(_OUTPUTS)
+    unknown = existing - set(OUTPUT_ARTIFACTS)
     if unknown:
         raise EndoEvalError(f"output directory contains unrelated files: {sorted(unknown)}")
     if not overwrite:
@@ -120,6 +121,7 @@ def evaluate(
     authority_sha256 = file_sha256(validated["authority_path"])
     submission_sha256 = file_sha256(submission_path)
     dimensions_wh = tuple(authority["dimensions_wh"])
+    support_threshold = authority["support"]["threshold"]
     scene_inputs = {scene["scene"]: scene for scene in validated["scenes"]}
 
     scene_results: dict[str, Any] = {}
@@ -162,14 +164,12 @@ def evaluate(
                 raise EndoEvalError(
                     f"reference and prediction shapes differ for {scene_name}/{frame_id}"
                 )
-            selected = (tool_mask <= authority["support"]["threshold"]) & (
-                invalid_mask <= authority["support"]["threshold"]
-            )
+            selected = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
             stats = region_error_source_stats(prediction, reference, selected)
             frame_score = compare_psnr_denominators(
                 stats, convention=FINITE_PSNR_CONVENTION
             )
-            if frame_score.status not in {"complete", "tied_perfect"} or frame_score.true_psnr is None:
+            if frame_score.status not in _SCOREABLE_STATUSES or frame_score.true_psnr is None:
                 raise EndoEvalError(
                     f"PSNR is undefined for {scene_name}/{frame_id}: {frame_score.status}"
                 )
@@ -199,7 +199,7 @@ def evaluate(
             reduction="frame_mean",
             convention=FINITE_PSNR_CONVENTION,
         )
-        if scene_score.status not in {"complete", "tied_perfect"} or scene_score.true_psnr is None:
+        if scene_score.status not in _SCOREABLE_STATUSES or scene_score.true_psnr is None:
             raise EndoEvalError(f"scene PSNR is undefined for {scene_name}: {scene_score.status}")
         scene_results[scene_name] = {
             "psnr_db": scene_score.true_psnr,
@@ -346,7 +346,7 @@ def evaluate(
         "measurement_sha256": measurement_sha256,
         "artifact_sha256": artifact_sha256,
         "receipt": str(receipt_path),
-        "outputs": list(_OUTPUTS),
+        "outputs": list(OUTPUT_ARTIFACTS),
     }
 
 
