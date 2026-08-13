@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
@@ -141,9 +142,12 @@ def _profile_path(profile_id: str) -> Path:
     return path
 
 
-def load_profile(profile_id: str) -> dict[str, Any]:
+def load_profile(profile_id: str) -> tuple[dict[str, Any], Path]:
+    """Load one scoreable profile together with the file that defines it."""
+
+    path = _profile_path(profile_id)
     profile = _require_exact_keys(
-        load_json(_profile_path(profile_id)),
+        load_json(path),
         {
             "artifact",
             "schema_version",
@@ -201,10 +205,12 @@ def load_profile(profile_id: str) -> dict[str, Any]:
         raise EndoEvalError("unsupported scene reduction")
     if tuple(profile["outputs"]) != OUTPUT_ARTIFACTS:
         raise EndoEvalError("profile output contract moved")
-    return profile
+    return profile, path
 
 
 def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
+    """Load a profile's frozen dataset authority together with its file."""
+
     profile_id = profile["profile_id"]
     authority_name = safe_relative_path(
         profile["dataset"]["authority"], field="profile.dataset.authority"
@@ -298,12 +304,14 @@ def load_authority(profile: dict[str, Any]) -> tuple[dict[str, Any], Path]:
 
 
 def list_profiles() -> list[dict[str, Any]]:
+    """Summarise every profile installed under the profile root."""
+
     root = profile_root()
     profiles: list[dict[str, Any]] = []
     for path in sorted(root.glob("*.json")):
         if path.name.endswith("-authority.json"):
             continue
-        profile = load_profile(path.stem)
+        profile, _ = load_profile(path.stem)
         authority, _ = load_authority(profile)
         profiles.append(
             {
@@ -320,7 +328,30 @@ def list_profiles() -> list[dict[str, Any]]:
     return profiles
 
 
-def validate_submission(submission_path: Path) -> dict[str, Any]:
+@dataclass(frozen=True)
+class SceneBinding:
+    """One submission scene bound to its declared prediction directory."""
+
+    scene: str
+    predictions: str
+
+
+@dataclass(frozen=True)
+class ValidatedSubmission:
+    """One submission validated against its profile and dataset authority."""
+
+    path: Path
+    document: dict[str, Any]
+    profile: dict[str, Any]
+    profile_path: Path
+    authority: dict[str, Any]
+    authority_path: Path
+    scenes: tuple[SceneBinding, ...]
+
+
+def validate_submission(submission_path: Path) -> ValidatedSubmission:
+    """Validate one submission document against the profile it names."""
+
     submission_path = submission_path.expanduser().resolve()
     submission = _require_exact_keys(
         load_json(submission_path),
@@ -332,7 +363,7 @@ def validate_submission(submission_path: Path) -> dict[str, Any]:
     profile_id = submission["profile"]
     if not isinstance(profile_id, str):
         raise EndoEvalError("submission.profile must be a string")
-    profile = load_profile(profile_id)
+    profile, profile_path = load_profile(profile_id)
     authority, authority_path = load_authority(profile)
     method = submission["method"]
     if not isinstance(method, dict) or not set(method).issubset({"name", "version", "source_commit"}):
@@ -351,7 +382,7 @@ def validate_submission(submission_path: Path) -> dict[str, Any]:
         raise EndoEvalError("submission.scenes must be a non-empty array")
     expected = {scene["scene"] for scene in authority["scenes"]}
     seen: set[str] = set()
-    normalized: list[dict[str, str]] = []
+    bindings: list[SceneBinding] = []
     for index, raw_scene in enumerate(raw_scenes):
         scene = _require_exact_keys(raw_scene, {"scene", "predictions"}, name=f"submission.scenes[{index}]")
         name = scene["scene"]
@@ -361,49 +392,53 @@ def validate_submission(submission_path: Path) -> dict[str, Any]:
         predictions = safe_relative_path(
             scene["predictions"], field=f"submission.scenes[{index}].predictions"
         )
-        normalized.append({"scene": name, "predictions": predictions})
+        bindings.append(SceneBinding(scene=name, predictions=predictions))
     if seen != expected:
         raise EndoEvalError(
             f"submission scenes differ from profile: extra={sorted(seen - expected)}, "
             f"missing={sorted(expected - seen)}"
         )
-    return {
-        "path": submission_path,
-        "document": submission,
-        "profile": profile,
-        "authority": authority,
-        "profile_path": _profile_path(profile_id),
-        "authority_path": authority_path,
-        "scenes": normalized,
-    }
+    return ValidatedSubmission(
+        path=submission_path,
+        document=submission,
+        profile=profile,
+        profile_path=profile_path,
+        authority=authority,
+        authority_path=authority_path,
+        scenes=tuple(bindings),
+    )
 
 
 def expected_prediction_files(authority_scene: dict[str, Any]) -> set[str]:
     return {f"{frame['frame_id']}.png" for frame in authority_scene["frames"]}
 
 
-def validate_prediction_directories(validated: dict[str, Any]) -> dict[str, list[str]]:
-    base = validated["path"].parent
-    authority_by_scene = {scene["scene"]: scene for scene in validated["authority"]["scenes"]}
+def validate_prediction_directories(validated: ValidatedSubmission) -> dict[str, list[str]]:
+    """Require every bound prediction directory to hold exactly the expected frames."""
+
+    base = validated.path.parent
+    authority_by_scene = {scene["scene"]: scene for scene in validated.authority["scenes"]}
     result: dict[str, list[str]] = {}
-    for scene in validated["scenes"]:
-        directory = resolve_inside(base, scene["predictions"], field=f"predictions[{scene['scene']}]")
+    for binding in validated.scenes:
+        directory = resolve_inside(base, binding.predictions, field=f"predictions[{binding.scene}]")
         if not directory.is_dir():
             raise EndoEvalError(f"prediction directory is missing: {directory}")
-        expected = expected_prediction_files(authority_by_scene[scene["scene"]])
+        expected = expected_prediction_files(authority_by_scene[binding.scene])
         actual = {path.name for path in directory.iterdir() if path.is_file() and path.suffix.lower() == ".png"}
         if actual != expected:
             raise EndoEvalError(
-                f"prediction files differ for {scene['scene']}: "
+                f"prediction files differ for {binding.scene}: "
                 f"extra={sorted(actual - expected)}, missing={sorted(expected - actual)}"
             )
-        result[scene["scene"]] = sorted(actual)
+        result[binding.scene] = sorted(actual)
     return result
 
 
 __all__ = [
     "EndoEvalError",
     "OUTPUT_ARTIFACTS",
+    "SceneBinding",
+    "ValidatedSubmission",
     "canonical_sha256",
     "expected_prediction_files",
     "file_sha256",

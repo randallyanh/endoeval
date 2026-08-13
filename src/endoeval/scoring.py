@@ -104,7 +104,7 @@ def evaluate(
 ) -> dict[str, Any]:
     validated = validate_submission(submission_path)
     prediction_files = validate_prediction_directories(validated)
-    submission_path = validated["path"]
+    submission_path = validated.path
     dataset_root = dataset_root.expanduser().resolve()
     if not dataset_root.is_dir():
         raise EndoEvalError(f"dataset root is not a directory: {dataset_root}")
@@ -115,14 +115,14 @@ def evaluate(
     )
     _prepare_output_directory(output_dir, overwrite=overwrite)
 
-    profile = validated["profile"]
-    authority = validated["authority"]
-    profile_sha256 = file_sha256(validated["profile_path"])
-    authority_sha256 = file_sha256(validated["authority_path"])
+    profile = validated.profile
+    authority = validated.authority
+    profile_sha256 = file_sha256(validated.profile_path)
+    authority_sha256 = file_sha256(validated.authority_path)
     submission_sha256 = file_sha256(submission_path)
     dimensions_wh = tuple(authority["dimensions_wh"])
     support_threshold = authority["support"]["threshold"]
-    scene_inputs = {scene["scene"]: scene for scene in validated["scenes"]}
+    bindings = {binding.scene: binding for binding in validated.scenes}
 
     scene_results: dict[str, Any] = {}
     prediction_identity_records: list[dict[str, Any]] = []
@@ -132,10 +132,9 @@ def evaluate(
 
     for authority_scene in authority["scenes"]:
         scene_name = authority_scene["scene"]
-        submission_scene = scene_inputs[scene_name]
         prediction_dir = resolve_inside(
             submission_path.parent,
-            submission_scene["predictions"],
+            bindings[scene_name].predictions,
             field=f"predictions[{scene_name}]",
         )
         statistics = []
@@ -255,7 +254,7 @@ def evaluate(
         "reduction_sha256": reduction_sha256,
     }
     measurement_sha256 = canonical_sha256(measurement_components)
-    method = validated["document"]["method"]
+    method = validated.document["method"]
     artifact_sha256 = canonical_sha256(
         {
             "method": method,

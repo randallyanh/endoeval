@@ -6,7 +6,7 @@ from endoeval.contracts import EndoEvalError,load_authority,load_profile,safe_re
 
 class ProfileIntegrityTests(unittest.TestCase):
     def test_bundled_profile_and_input_boundary(self):
-        profile=load_profile('endonerf-rgb-v1'); authority,_=load_authority(profile)
+        profile,_=load_profile('endonerf-rgb-v1'); authority,_=load_authority(profile)
         self.assertEqual(profile['status'],'ready')
         self.assertEqual([len(s['frames']) for s in authority['scenes']],[20,8])
         self.assertEqual(sum(len(s['frames']) for s in authority['scenes']),28)

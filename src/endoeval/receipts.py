@@ -56,10 +56,8 @@ def verify_receipt(receipt_path: Path) -> dict[str, Any]:
         raise EndoEvalError("receipt_sha256 does not match the receipt content")
     if canonical_sha256(receipt["measurement"]) != receipt["measurement_sha256"]:
         raise EndoEvalError("measurement_sha256 does not match its components")
-    profile = load_profile(receipt["profile_id"])
-    authority, authority_path = load_authority(profile)
-    del authority
-    profile_path = authority_path.parent / f"{receipt['profile_id']}.json"
+    profile, profile_path = load_profile(receipt["profile_id"])
+    _, authority_path = load_authority(profile)
     if file_sha256(profile_path) != receipt["profile_sha256"]:
         raise EndoEvalError("the installed profile differs from the evaluated profile")
     if file_sha256(authority_path) != receipt["authority_sha256"]:
