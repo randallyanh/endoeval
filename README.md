@@ -1,4 +1,4 @@
-# EndoEval — Private Reference Evaluator
+# EndoEval — Reference Evaluator
 
 EndoEval evaluates rendered RGB outputs from dynamic endoscopic reconstruction methods under a versioned, inspectable measurement profile.
 
@@ -11,7 +11,7 @@ render predictions
 → receive metrics, a paper table, a receipt, and a claim boundary
 ```
 
-It is private pre-release work. It is not yet an open-source release, an official challenge evaluator, or a community standard. Adoption as a field default is tracked separately from the quality and completeness of this implementation.
+It is pre-release work accompanying a paper submission. It is not yet an open-source release, an official challenge evaluator, or a community standard. Adoption as a field default is tracked separately from the quality and completeness of this implementation.
 
 ## Install
 
