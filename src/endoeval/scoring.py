@@ -181,8 +181,8 @@ def _score_frame(
         )
     if reference.shape != prediction.shape:
         raise EndoEvalError(f"reference and prediction shapes differ for {scene_name}/{frame_id}")
-    support = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
     try:
+        support = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
         stats = region_error_source_stats(prediction, reference, support)
         score = compare_psnr_denominators(stats, convention=FINITE_PSNR_CONVENTION)
     except ValueError as exc:
