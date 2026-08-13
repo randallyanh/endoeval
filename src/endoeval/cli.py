@@ -176,7 +176,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         result = args.run(args)
-    except (EndoEvalError, ValueError) as exc:
+    except EndoEvalError as exc:
         _print(
             {"artifact": "endoeval_error", "status": "error", "error": str(exc)},
             stream=sys.stderr,

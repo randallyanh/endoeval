@@ -5,6 +5,8 @@ from __future__ import annotations
 import csv
 import hashlib
 import math
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +14,12 @@ import numpy as np
 from PIL import Image
 
 from benchmark_integrity.metric_conventions import FINITE_PSNR_CONVENTION
-from benchmark_integrity.region_error import aggregate_region_errors, compare_psnr_denominators
+from benchmark_integrity.region_error import (
+    PsnrDenominatorResult,
+    RegionErrorStats,
+    aggregate_region_errors,
+    compare_psnr_denominators,
+)
 from endoeval.contracts import (
     EndoEvalError,
     OUTPUT_ARTIFACTS,
@@ -26,6 +33,42 @@ from endoeval.contracts import (
 from endoeval.image_stats import region_error_source_stats
 
 _SCOREABLE_STATUSES = frozenset({"complete", "tied_perfect"})
+
+
+@dataclass(frozen=True)
+class FrameMeasurement:
+    """One frame's score together with the identities that produced it."""
+
+    scene: str
+    frame_id: str
+    native_frame_id: int
+    stats: RegionErrorStats
+    psnr_db: float
+    prediction_sha256: str
+    reference_sha256: str
+    support_sha256: str
+
+    @property
+    def key(self) -> str:
+        return f"{self.scene}/{self.frame_id}"
+
+    @property
+    def coverage(self) -> float:
+        return self.stats.selected_pixels / self.stats.total_pixels
+
+
+@dataclass(frozen=True)
+class SceneMeasurement:
+    """One scene's unweighted frame-mean score over its frozen frames."""
+
+    scene: str
+    psnr_db: float
+    frames: tuple[FrameMeasurement, ...]
+    prediction_files: tuple[str, ...]
+
+    @property
+    def coverage_mean(self) -> float:
+        return math.fsum(frame.coverage for frame in self.frames) / len(self.frames)
 
 
 def _load_rgb(path: Path) -> np.ndarray:
@@ -95,142 +138,138 @@ def _keyed_digest(records: list[dict[str, Any]]) -> str:
     return canonical_sha256(sorted(records, key=lambda item: item["key"]))
 
 
-def evaluate(
-    submission_path: Path,
+def _require_scoreable(score: PsnrDenominatorResult, *, subject: str) -> float:
+    """Require a defined PSNR under the profile's finite convention."""
+
+    if score.status not in _SCOREABLE_STATUSES or score.true_psnr is None:
+        raise EndoEvalError(f"PSNR is undefined for {subject}: {score.status}")
+    return score.true_psnr
+
+
+def _score_frame(
+    authority_scene: dict[str, Any],
+    frame: dict[str, Any],
     *,
+    prediction_dir: Path,
     dataset_root: Path,
-    output: Path | None = None,
-    overwrite: bool = False,
-) -> dict[str, Any]:
-    validated = validate_submission(submission_path)
-    prediction_files = validate_prediction_directories(validated)
-    submission_path = validated.path
-    dataset_root = dataset_root.expanduser().resolve()
-    if not dataset_root.is_dir():
-        raise EndoEvalError(f"dataset root is not a directory: {dataset_root}")
-    output_dir = (
-        output.expanduser().resolve()
-        if output is not None
-        else (submission_path.parent / "endoeval-output").resolve()
-    )
-    _prepare_output_directory(output_dir, overwrite=overwrite)
+    dimensions_wh: tuple[int, int],
+    support_threshold: float,
+) -> FrameMeasurement:
+    """Measure one frame against its byte-verified reference and support."""
 
-    profile = validated.profile
-    authority = validated.authority
-    profile_sha256 = file_sha256(validated.profile_path)
-    authority_sha256 = file_sha256(validated.authority_path)
-    submission_sha256 = file_sha256(submission_path)
-    dimensions_wh = tuple(authority["dimensions_wh"])
-    support_threshold = authority["support"]["threshold"]
-    bindings = {binding.scene: binding for binding in validated.scenes}
+    scene_name = authority_scene["scene"]
+    frame_id = frame["frame_id"]
+    prediction_path = prediction_dir / f"{frame_id}.png"
+    reference_path = _format_dataset_path(dataset_root, authority_scene, "reference_template", frame)
+    tool_mask_path = _format_dataset_path(dataset_root, authority_scene, "tool_mask_template", frame)
+    invalid_mask_path = _format_dataset_path(dataset_root, authority_scene, "invalid_mask_template", frame)
+    _require_file(reference_path, frame["reference_sha256"], role="reference image")
+    _require_file(tool_mask_path, frame["tool_mask_sha256"], role="tool mask")
+    _require_file(invalid_mask_path, frame["invalid_mask_sha256"], role="invalid-region mask")
 
-    scene_results: dict[str, Any] = {}
-    prediction_identity_records: list[dict[str, Any]] = []
-    reference_identity_records: list[dict[str, Any]] = []
-    support_identity_records: list[dict[str, Any]] = []
-    frame_population_records: list[dict[str, Any]] = []
-
-    for authority_scene in authority["scenes"]:
-        scene_name = authority_scene["scene"]
-        prediction_dir = resolve_inside(
-            submission_path.parent,
-            bindings[scene_name].predictions,
-            field=f"predictions[{scene_name}]",
+    prediction = _load_rgb(prediction_path)
+    reference = _load_rgb(reference_path)
+    tool_mask = _load_mask(tool_mask_path)
+    invalid_mask = _load_mask(invalid_mask_path)
+    if (prediction.shape[1], prediction.shape[0]) != dimensions_wh:
+        raise EndoEvalError(
+            f"prediction {scene_name}/{frame_id} has dimensions "
+            f"{prediction.shape[1]}x{prediction.shape[0]}, expected "
+            f"{dimensions_wh[0]}x{dimensions_wh[1]}"
         )
-        statistics = []
-        per_frame: list[dict[str, Any]] = []
-        for frame in authority_scene["frames"]:
-            frame_id = frame["frame_id"]
-            prediction_path = prediction_dir / f"{frame_id}.png"
-            reference_path = _format_dataset_path(dataset_root, authority_scene, "reference_template", frame)
-            tool_mask_path = _format_dataset_path(dataset_root, authority_scene, "tool_mask_template", frame)
-            invalid_mask_path = _format_dataset_path(dataset_root, authority_scene, "invalid_mask_template", frame)
-            _require_file(reference_path, frame["reference_sha256"], role="reference image")
-            _require_file(tool_mask_path, frame["tool_mask_sha256"], role="tool mask")
-            _require_file(invalid_mask_path, frame["invalid_mask_sha256"], role="invalid-region mask")
+    if reference.shape != prediction.shape:
+        raise EndoEvalError(f"reference and prediction shapes differ for {scene_name}/{frame_id}")
+    support = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
+    try:
+        stats = region_error_source_stats(prediction, reference, support)
+        score = compare_psnr_denominators(stats, convention=FINITE_PSNR_CONVENTION)
+    except ValueError as exc:
+        raise EndoEvalError(f"cannot score {scene_name}/{frame_id}: {exc}") from exc
+    return FrameMeasurement(
+        scene=scene_name,
+        frame_id=frame_id,
+        native_frame_id=frame["native_frame_id"],
+        stats=stats,
+        psnr_db=_require_scoreable(score, subject=f"{scene_name}/{frame_id}"),
+        prediction_sha256=file_sha256(prediction_path),
+        reference_sha256=frame["reference_sha256"],
+        support_sha256=hashlib.sha256(
+            np.ascontiguousarray(support, dtype=np.uint8).tobytes()
+        ).hexdigest(),
+    )
 
-            prediction = _load_rgb(prediction_path)
-            reference = _load_rgb(reference_path)
-            tool_mask = _load_mask(tool_mask_path)
-            invalid_mask = _load_mask(invalid_mask_path)
-            if (prediction.shape[1], prediction.shape[0]) != dimensions_wh:
-                raise EndoEvalError(
-                    f"prediction {scene_name}/{frame_id} has dimensions "
-                    f"{prediction.shape[1]}x{prediction.shape[0]}, expected "
-                    f"{dimensions_wh[0]}x{dimensions_wh[1]}"
-                )
-            if reference.shape != prediction.shape:
-                raise EndoEvalError(
-                    f"reference and prediction shapes differ for {scene_name}/{frame_id}"
-                )
-            selected = (tool_mask <= support_threshold) & (invalid_mask <= support_threshold)
-            stats = region_error_source_stats(prediction, reference, selected)
-            frame_score = compare_psnr_denominators(
-                stats, convention=FINITE_PSNR_CONVENTION
-            )
-            if frame_score.status not in _SCOREABLE_STATUSES or frame_score.true_psnr is None:
-                raise EndoEvalError(
-                    f"PSNR is undefined for {scene_name}/{frame_id}: {frame_score.status}"
-                )
-            statistics.append(stats)
-            prediction_sha256 = file_sha256(prediction_path)
-            selection_sha256 = hashlib.sha256(
-                np.ascontiguousarray(selected, dtype=np.uint8).tobytes()
-            ).hexdigest()
-            key = f"{scene_name}/{frame_id}"
-            prediction_identity_records.append({"key": key, "sha256": prediction_sha256})
-            reference_identity_records.append({"key": key, "sha256": frame["reference_sha256"]})
-            support_identity_records.append({"key": key, "sha256": selection_sha256})
-            frame_population_records.append({"key": key, "native_frame_id": frame["native_frame_id"]})
-            per_frame.append(
-                {
-                    "frame_id": frame_id,
-                    "native_frame_id": frame["native_frame_id"],
-                    "psnr_db": frame_score.true_psnr,
-                    "selected_pixels": stats.selected_pixels,
-                    "total_pixels": stats.total_pixels,
-                    "coverage": stats.selected_pixels / stats.total_pixels,
-                    "prediction_sha256": prediction_sha256,
-                }
-            )
-        scene_score = aggregate_region_errors(
-            statistics,
+
+def _score_scene(
+    authority_scene: dict[str, Any],
+    *,
+    prediction_dir: Path,
+    prediction_files: Sequence[str],
+    dataset_root: Path,
+    dimensions_wh: tuple[int, int],
+    support_threshold: float,
+) -> SceneMeasurement:
+    """Measure one scene as the unweighted mean over its frozen frames."""
+
+    scene_name = authority_scene["scene"]
+    frames = tuple(
+        _score_frame(
+            authority_scene,
+            frame,
+            prediction_dir=prediction_dir,
+            dataset_root=dataset_root,
+            dimensions_wh=dimensions_wh,
+            support_threshold=support_threshold,
+        )
+        for frame in authority_scene["frames"]
+    )
+    try:
+        score = aggregate_region_errors(
+            [frame.stats for frame in frames],
             reduction="frame_mean",
             convention=FINITE_PSNR_CONVENTION,
         )
-        if scene_score.status not in _SCOREABLE_STATUSES or scene_score.true_psnr is None:
-            raise EndoEvalError(f"scene PSNR is undefined for {scene_name}: {scene_score.status}")
-        scene_results[scene_name] = {
-            "psnr_db": scene_score.true_psnr,
-            "n_frames": len(statistics),
-            "coverage_mean": math.fsum(
-                row.selected_pixels / row.total_pixels for row in statistics
-            )
-            / len(statistics),
-            "frames": per_frame,
-            "prediction_files": prediction_files[scene_name],
-        }
+    except ValueError as exc:
+        raise EndoEvalError(f"cannot aggregate scene {scene_name}: {exc}") from exc
+    return SceneMeasurement(
+        scene=scene_name,
+        psnr_db=_require_scoreable(score, subject=f"scene {scene_name}"),
+        frames=frames,
+        prediction_files=tuple(prediction_files),
+    )
 
-    aggregate_psnr = math.fsum(
-        result["psnr_db"] for result in scene_results.values()
-    ) / len(scene_results)
-    frame_population_sha256 = _keyed_digest(frame_population_records)
-    reference_rgb_sha256 = _keyed_digest(reference_identity_records)
-    mask_support_sha256 = _keyed_digest(support_identity_records)
-    prediction_set_sha256 = _keyed_digest(prediction_identity_records)
-    output_target_sha256 = canonical_sha256(
-        {
-            "task": profile["task"],
-            "dataset": profile["dataset"]["name"],
-            "release": profile["dataset"]["release"],
-            "frame_population_sha256": frame_population_sha256,
-        }
+
+def _measurement_identity(
+    profile: dict[str, Any],
+    scenes: Sequence[SceneMeasurement],
+    *,
+    profile_sha256: str,
+    authority_sha256: str,
+) -> dict[str, str]:
+    """Assemble the named digests that identify one measurement."""
+
+    frames = [frame for scene in scenes for frame in scene.frames]
+    frame_population_sha256 = _keyed_digest(
+        [{"key": frame.key, "native_frame_id": frame.native_frame_id} for frame in frames]
+    )
+    reference_rgb_sha256 = _keyed_digest(
+        [{"key": frame.key, "sha256": frame.reference_sha256} for frame in frames]
+    )
+    mask_support_sha256 = _keyed_digest(
+        [{"key": frame.key, "sha256": frame.support_sha256} for frame in frames]
     )
     metric_definition_sha256 = canonical_sha256(profile["measurement"]["metric"])
     reduction_sha256 = canonical_sha256(
         {
             "frame_reduction": profile["measurement"]["frame_reduction"],
             "scene_reduction": profile["measurement"]["scene_reduction"],
+        }
+    )
+    output_target_sha256 = canonical_sha256(
+        {
+            "task": profile["task"],
+            "dataset": profile["dataset"]["name"],
+            "release": profile["dataset"]["release"],
+            "frame_population_sha256": frame_population_sha256,
         }
     )
     scoring_protocol_sha256 = canonical_sha256(
@@ -244,7 +283,7 @@ def evaluate(
             "image_decoder": "Pillow RGB/L uint8",
         }
     )
-    measurement_components = {
+    return {
         "output_target_sha256": output_target_sha256,
         "frame_population_sha256": frame_population_sha256,
         "mask_support_sha256": mask_support_sha256,
@@ -253,34 +292,57 @@ def evaluate(
         "metric_definition_sha256": metric_definition_sha256,
         "reduction_sha256": reduction_sha256,
     }
-    measurement_sha256 = canonical_sha256(measurement_components)
-    method = validated.document["method"]
-    artifact_sha256 = canonical_sha256(
-        {
-            "method": method,
-            "profile_id": profile["profile_id"],
-            "prediction_set_sha256": prediction_set_sha256,
-        }
-    )
 
-    metrics = {
+
+def _frame_document(frame: FrameMeasurement) -> dict[str, Any]:
+    return {
+        "frame_id": frame.frame_id,
+        "native_frame_id": frame.native_frame_id,
+        "psnr_db": frame.psnr_db,
+        "selected_pixels": frame.stats.selected_pixels,
+        "total_pixels": frame.stats.total_pixels,
+        "coverage": frame.coverage,
+        "prediction_sha256": frame.prediction_sha256,
+    }
+
+
+def _metrics_document(
+    profile: dict[str, Any],
+    method: dict[str, str],
+    scenes: Sequence[SceneMeasurement],
+    *,
+    aggregate_psnr: float,
+) -> dict[str, Any]:
+    return {
         "artifact": "endoeval_metrics",
         "schema_version": 1,
         "profile_id": profile["profile_id"],
         "method": method,
         "metric": profile["measurement"]["metric"],
         "scene_reduction": profile["measurement"]["scene_reduction"],
-        "scenes": scene_results,
+        "scenes": {
+            scene.scene: {
+                "psnr_db": scene.psnr_db,
+                "n_frames": len(scene.frames),
+                "coverage_mean": scene.coverage_mean,
+                "frames": [_frame_document(frame) for frame in scene.frames],
+                "prediction_files": list(scene.prediction_files),
+            }
+            for scene in scenes
+        },
         "aggregate": {
             "psnr_db": aggregate_psnr,
-            "n_scenes": len(scene_results),
-            "n_frames": sum(result["n_frames"] for result in scene_results.values()),
+            "n_scenes": len(scenes),
+            "n_frames": sum(len(scene.frames) for scene in scenes),
         },
     }
-    admission = {
+
+
+def _admission_document(profile_id: str, measurement_sha256: str) -> dict[str, Any]:
+    return {
         "artifact": "endoeval_admission",
         "schema_version": 1,
-        "profile_id": profile["profile_id"],
+        "profile_id": profile_id,
         "measurement_sha256": measurement_sha256,
         "claims": {
             "scalar": {
@@ -298,21 +360,103 @@ def evaluate(
             },
         },
     }
+
+
+def _write_paper_table(
+    path: Path,
+    *,
+    profile_id: str,
+    method_name: str,
+    scenes: Sequence[SceneMeasurement],
+    aggregate_psnr: float,
+) -> None:
+    total_frames = sum(len(scene.frames) for scene in scenes)
+    with path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(["profile", "method", "scene", "psnr_db", "n_frames"])
+        for scene in scenes:
+            writer.writerow(
+                [profile_id, method_name, scene.scene, f"{scene.psnr_db:.6f}", len(scene.frames)]
+            )
+        writer.writerow(
+            [profile_id, method_name, "equal_scene_mean", f"{aggregate_psnr:.6f}", total_frames]
+        )
+
+
+def evaluate(
+    submission_path: Path,
+    *,
+    dataset_root: Path,
+    output: Path | None = None,
+    overwrite: bool = False,
+) -> dict[str, Any]:
+    """Score one validated submission and write the four output artifacts."""
+
+    validated = validate_submission(submission_path)
+    prediction_files = validate_prediction_directories(validated)
+    dataset_root = dataset_root.expanduser().resolve()
+    if not dataset_root.is_dir():
+        raise EndoEvalError(f"dataset root is not a directory: {dataset_root}")
+    output_dir = (
+        output.expanduser().resolve()
+        if output is not None
+        else (validated.path.parent / "endoeval-output").resolve()
+    )
+    _prepare_output_directory(output_dir, overwrite=overwrite)
+
+    authority = validated.authority
+    dimensions_wh = tuple(authority["dimensions_wh"])
+    support_threshold = authority["support"]["threshold"]
+    bindings = {binding.scene: binding for binding in validated.scenes}
+    scenes = [
+        _score_scene(
+            authority_scene,
+            prediction_dir=resolve_inside(
+                validated.path.parent,
+                bindings[authority_scene["scene"]].predictions,
+                field=f"predictions[{authority_scene['scene']}]",
+            ),
+            prediction_files=prediction_files[authority_scene["scene"]],
+            dataset_root=dataset_root,
+            dimensions_wh=dimensions_wh,
+            support_threshold=support_threshold,
+        )
+        for authority_scene in authority["scenes"]
+    ]
+    aggregate_psnr = math.fsum(scene.psnr_db for scene in scenes) / len(scenes)
+
+    profile = validated.profile
+    method = validated.document["method"]
+    profile_sha256 = file_sha256(validated.profile_path)
+    authority_sha256 = file_sha256(validated.authority_path)
+    measurement = _measurement_identity(
+        profile, scenes, profile_sha256=profile_sha256, authority_sha256=authority_sha256
+    )
+    measurement_sha256 = canonical_sha256(measurement)
+    frames = [frame for scene in scenes for frame in scene.frames]
+    prediction_set_sha256 = _keyed_digest(
+        [{"key": frame.key, "sha256": frame.prediction_sha256} for frame in frames]
+    )
+    artifact_sha256 = canonical_sha256(
+        {
+            "method": method,
+            "profile_id": profile["profile_id"],
+            "prediction_set_sha256": prediction_set_sha256,
+        }
+    )
+
     metrics_path = output_dir / "metrics.json"
     admission_path = output_dir / "admission.json"
     table_path = output_dir / "paper_table.csv"
-    write_json(metrics_path, metrics)
-    write_json(admission_path, admission)
-    with table_path.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.writer(stream)
-        writer.writerow(["profile", "method", "scene", "psnr_db", "n_frames"])
-        for scene_name, result in scene_results.items():
-            writer.writerow(
-                [profile["profile_id"], method["name"], scene_name, f"{result['psnr_db']:.6f}", result["n_frames"]]
-            )
-        writer.writerow(
-            [profile["profile_id"], method["name"], "equal_scene_mean", f"{aggregate_psnr:.6f}", metrics["aggregate"]["n_frames"]]
-        )
+    write_json(metrics_path, _metrics_document(profile, method, scenes, aggregate_psnr=aggregate_psnr))
+    write_json(admission_path, _admission_document(profile["profile_id"], measurement_sha256))
+    _write_paper_table(
+        table_path,
+        profile_id=profile["profile_id"],
+        method_name=method["name"],
+        scenes=scenes,
+        aggregate_psnr=aggregate_psnr,
+    )
 
     receipt = {
         "artifact": "endoeval_evaluation_receipt",
@@ -320,11 +464,11 @@ def evaluate(
         "profile_id": profile["profile_id"],
         "profile_sha256": profile_sha256,
         "authority_sha256": authority_sha256,
-        "submission_sha256": submission_sha256,
+        "submission_sha256": file_sha256(validated.path),
         "method": method,
         "artifact_sha256": artifact_sha256,
         "prediction_set_sha256": prediction_set_sha256,
-        "measurement": measurement_components,
+        "measurement": measurement,
         "measurement_sha256": measurement_sha256,
         "aggregate_psnr_db": aggregate_psnr,
         "outputs": {
