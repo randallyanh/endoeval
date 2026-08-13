@@ -1,0 +1,21 @@
+{
+  "artifact": "endoeval_admission",
+  "claims": {
+    "artifact_ordering": {
+      "admitted": true,
+      "condition": "the compared receipt has the same measurement identity"
+    },
+    "capability": {
+      "admitted": false,
+      "disposition": "rerun_required",
+      "reason": "an output-only evaluation does not establish training or capability equivalence"
+    },
+    "scalar": {
+      "admitted": true,
+      "basis": "complete evaluation under one identified measurement"
+    }
+  },
+  "measurement_sha256": "1a94e871acd1a5fedb1e4a97d37a6de002f9f012acbd1cea18b431d74404c5d9",
+  "profile_id": "endonerf-rgb-v1",
+  "schema_version": 1
+}

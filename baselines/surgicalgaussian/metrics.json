@@ -1,0 +1,322 @@
+{
+  "aggregate": {
+    "n_frames": 28,
+    "n_scenes": 2,
+    "psnr_db": 19.262859151206477
+  },
+  "artifact": "endoeval_metrics",
+  "method": {
+    "name": "surgicalgaussian",
+    "source_commit": "c0ac51a",
+    "version": "official_code_retrain_iter3000"
+  },
+  "metric": {
+    "convention": "psnr_mse_eps_1e-10",
+    "data_range": 1.0,
+    "denominator": "true_exclusion",
+    "family": "PSNR"
+  },
+  "profile_id": "endonerf-rgb-v1",
+  "scene_reduction": "equal_scene_weight",
+  "scenes": {
+    "cutting": {
+      "coverage_mean": 0.112056884765625,
+      "frames": [
+        {
+          "coverage": 0.114862060546875,
+          "frame_id": "000001",
+          "native_frame_id": 1,
+          "prediction_sha256": "24a8b9dc6a26198e03c76cf4036aeb13bebd0fea793c1d97ea97326e8b0c3439",
+          "psnr_db": 20.756415388061477,
+          "selected_pixels": 37638,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1136199951171875,
+          "frame_id": "000009",
+          "native_frame_id": 9,
+          "prediction_sha256": "83a002b1d326853d1a5daf0abad30b268ee676d60796fc3c4051dd32872f312f",
+          "psnr_db": 20.748176951312267,
+          "selected_pixels": 37231,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1123199462890625,
+          "frame_id": "000017",
+          "native_frame_id": 17,
+          "prediction_sha256": "592e148058900097f7f0960e9e8f6d92a62e4b1c1e96b139b6b3c0f3554e516c",
+          "psnr_db": 20.62694322492199,
+          "selected_pixels": 36805,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1115814208984375,
+          "frame_id": "000025",
+          "native_frame_id": 25,
+          "prediction_sha256": "4f27ea095b0dbb0cc9b0b613016b4335f4f4644a3a6f22ecb9c35db0df5bb9f3",
+          "psnr_db": 20.61692405122134,
+          "selected_pixels": 36563,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.10960693359375,
+          "frame_id": "000033",
+          "native_frame_id": 33,
+          "prediction_sha256": "2a39caa20ec1e5757e484e3bd0b57317d9218e533d5ade0ea2bd023e561612f6",
+          "psnr_db": 20.301006119673268,
+          "selected_pixels": 35916,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1096588134765625,
+          "frame_id": "000041",
+          "native_frame_id": 41,
+          "prediction_sha256": "77af7858a6b36d2e3d0eb7a5ed60dd713aeb922e9f2c9b4162ecc3aa209a1253",
+          "psnr_db": 19.863785691012836,
+          "selected_pixels": 35933,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1089996337890625,
+          "frame_id": "000049",
+          "native_frame_id": 49,
+          "prediction_sha256": "3a6eee6b4ad5c496b84e7a55567f70021cd123b3ed56e78e19598846fabe847d",
+          "psnr_db": 19.468148060066046,
+          "selected_pixels": 35717,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1083465576171875,
+          "frame_id": "000057",
+          "native_frame_id": 57,
+          "prediction_sha256": "e335cd1898c786463605391a1e0b8f1e374ce7bc1469e140adc3ace9720cc1ea",
+          "psnr_db": 19.63011479786407,
+          "selected_pixels": 35503,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1086181640625,
+          "frame_id": "000065",
+          "native_frame_id": 65,
+          "prediction_sha256": "8bc0ccc43d7572dbd7dafbbdf93915ca4020dba370aa069817a737e8e095204c",
+          "psnr_db": 19.64751409291422,
+          "selected_pixels": 35592,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.13338623046875,
+          "frame_id": "000073",
+          "native_frame_id": 73,
+          "prediction_sha256": "5ff70ca80aadcd250d4fbd5fa1b347c984002acc7a488e994a9f784c14b010b1",
+          "psnr_db": 20.06526634263851,
+          "selected_pixels": 43708,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.108251953125,
+          "frame_id": "000081",
+          "native_frame_id": 81,
+          "prediction_sha256": "0ced98499220eeda511b954df57eb0eba46816bdcb880306b32215453ce5970c",
+          "psnr_db": 19.331293777454974,
+          "selected_pixels": 35472,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.10816650390625,
+          "frame_id": "000089",
+          "native_frame_id": 89,
+          "prediction_sha256": "ecadff597ceae1d8db245c0363f77779f4aaaafe9e562acafacb2698b1973166",
+          "psnr_db": 19.19127341712304,
+          "selected_pixels": 35444,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.107080078125,
+          "frame_id": "000097",
+          "native_frame_id": 97,
+          "prediction_sha256": "c765b4ac905eb01260e0e56a530581741770bc536fae23e56ae17de1e78da05e",
+          "psnr_db": 19.205296317126894,
+          "selected_pixels": 35088,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1062591552734375,
+          "frame_id": "000105",
+          "native_frame_id": 105,
+          "prediction_sha256": "8954cedf64aa966fa2a504ead2157b2ad40081b8b32da37733a5bc41f53c4df0",
+          "psnr_db": 19.214020590446836,
+          "selected_pixels": 34819,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.108294677734375,
+          "frame_id": "000113",
+          "native_frame_id": 113,
+          "prediction_sha256": "8dc7756a060a88ba2fde7580997324aab254f51a3b8d1a9ddb78e971b294a07e",
+          "psnr_db": 19.48183940601154,
+          "selected_pixels": 35486,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.106707763671875,
+          "frame_id": "000121",
+          "native_frame_id": 121,
+          "prediction_sha256": "37aef30ee6d1c71dc1306558fd330b7848c1467043c057ed7cb0e58e0d72d5d6",
+          "psnr_db": 19.286886385171545,
+          "selected_pixels": 34966,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1097930908203125,
+          "frame_id": "000129",
+          "native_frame_id": 129,
+          "prediction_sha256": "18e1551dc2527666b13d71cf479777284e870735ca613fb5917bcdfd4ff7cc0e",
+          "psnr_db": 19.30563234065727,
+          "selected_pixels": 35977,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1136474609375,
+          "frame_id": "000137",
+          "native_frame_id": 137,
+          "prediction_sha256": "8bf6dd4fe7b6667c05e3768baef3d26d727f16d29daca10e4333cf34b11a7fa5",
+          "psnr_db": 19.474311861323244,
+          "selected_pixels": 37240,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1345550537109375,
+          "frame_id": "000145",
+          "native_frame_id": 145,
+          "prediction_sha256": "448598868ed5e75f3194b631cfda9ed345ff488be7915c886530e9525bb0f1bf",
+          "psnr_db": 20.10229554941402,
+          "selected_pixels": 44091,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.1073822021484375,
+          "frame_id": "000153",
+          "native_frame_id": 153,
+          "prediction_sha256": "6120f33dbdfce687b4fdc5ab98f0774d215aedc7e492524a83348a66740263b5",
+          "psnr_db": 19.63953140646072,
+          "selected_pixels": 35187,
+          "total_pixels": 327680
+        }
+      ],
+      "n_frames": 20,
+      "prediction_files": [
+        "000001.png",
+        "000009.png",
+        "000017.png",
+        "000025.png",
+        "000033.png",
+        "000041.png",
+        "000049.png",
+        "000057.png",
+        "000065.png",
+        "000073.png",
+        "000081.png",
+        "000089.png",
+        "000097.png",
+        "000105.png",
+        "000113.png",
+        "000121.png",
+        "000129.png",
+        "000137.png",
+        "000145.png",
+        "000153.png"
+      ],
+      "psnr_db": 19.797833788543805
+    },
+    "pulling": {
+      "coverage_mean": 0.06695175170898438,
+      "frames": [
+        {
+          "coverage": 0.072210693359375,
+          "frame_id": "000001",
+          "native_frame_id": 1,
+          "prediction_sha256": "645b8fb80715f4f49583439f1e0d932e867347be1a2d5932da19fa0d83d4e205",
+          "psnr_db": 19.20487389789589,
+          "selected_pixels": 23662,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.061083984375,
+          "frame_id": "000009",
+          "native_frame_id": 9,
+          "prediction_sha256": "4eda5c643818ca47bc6e869731a3b6185a986008bc31832de225c8c7a4313c08",
+          "psnr_db": 18.18758478986198,
+          "selected_pixels": 20016,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.06182861328125,
+          "frame_id": "000017",
+          "native_frame_id": 17,
+          "prediction_sha256": "706d697cc198ba945b7f44e387c88301d73d2553827c1160c4fc0cb7c865cec1",
+          "psnr_db": 18.26697888274676,
+          "selected_pixels": 20260,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.0528778076171875,
+          "frame_id": "000025",
+          "native_frame_id": 25,
+          "prediction_sha256": "fc10c0d34d66a5131b9df98be8585c6c50cec5c605d2df3a45500ab7856638de",
+          "psnr_db": 17.583743566332576,
+          "selected_pixels": 17327,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.0633880615234375,
+          "frame_id": "000033",
+          "native_frame_id": 33,
+          "prediction_sha256": "fe682b16a3f0cd7c231de8120ee95cad07a5255192625780858972e4a4f5123d",
+          "psnr_db": 18.34276991804373,
+          "selected_pixels": 20771,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.07080078125,
+          "frame_id": "000041",
+          "native_frame_id": 41,
+          "prediction_sha256": "f984b6c770c85e015327c1a7c0eb1e70840251a2e824a363b5ecb11b883da5ee",
+          "psnr_db": 19.29984646402518,
+          "selected_pixels": 23200,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.0781097412109375,
+          "frame_id": "000049",
+          "native_frame_id": 49,
+          "prediction_sha256": "15561a3df67940732c3d34bf336a46ec810d955f591813971dcd319e4cbbdf44",
+          "psnr_db": 19.55360221820177,
+          "selected_pixels": 25595,
+          "total_pixels": 327680
+        },
+        {
+          "coverage": 0.0753143310546875,
+          "frame_id": "000057",
+          "native_frame_id": 57,
+          "prediction_sha256": "7f34f61b1dd96a38a19a994922eab869feb8c184ad24614f7c24d36b20c79b54",
+          "psnr_db": 19.3836763738453,
+          "selected_pixels": 24679,
+          "total_pixels": 327680
+        }
+      ],
+      "n_frames": 8,
+      "prediction_files": [
+        "000001.png",
+        "000009.png",
+        "000017.png",
+        "000025.png",
+        "000033.png",
+        "000041.png",
+        "000049.png",
+        "000057.png"
+      ],
+      "psnr_db": 18.72788451386915
+    }
+  },
+  "schema_version": 1
+}

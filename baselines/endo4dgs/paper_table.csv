@@ -1,0 +1,4 @@
+profile,method,scene,psnr_db,n_frames
+endonerf-rgb-v1,endo4dgs,cutting,9.077048,20
+endonerf-rgb-v1,endo4dgs,pulling,13.339625,8
+endonerf-rgb-v1,endo4dgs,equal_scene_mean,11.208336,28

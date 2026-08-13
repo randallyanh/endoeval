@@ -1,0 +1,32 @@
+{
+  "aggregate_psnr_db": 17.988208180157848,
+  "artifact": "endoeval_evaluation_receipt",
+  "artifact_sha256": "f629c2df0f6369bd60316fcdb2140ced42ff75bbdb6ec0838c543a8236e1db03",
+  "authority_sha256": "23f684c2726d8c8800a032044b6e0accf4b55fbb513855b247286968ee756768",
+  "measurement": {
+    "frame_population_sha256": "48bb47c140e495e4d04877f3836c7380a2de034b1fd6d9222eeb78845f9abf55",
+    "mask_support_sha256": "0e1058aef6585d33b5f3ce188dccccd1d3b9c5f54f5b6fdc64097887b5126356",
+    "metric_definition_sha256": "f790c46bead4c3418da1145a3162d863fc0d985bf827f7ea7cd3ddbd286b2121",
+    "output_target_sha256": "71f7ce746bf58e28b6cb38179bd8a271b69e81338a5585a34b33dd1ed5cbc392",
+    "reduction_sha256": "45cf6cdd354222648f59c7378607c974df4b67496de705638e7b2e38158d0bca",
+    "reference_rgb_sha256": "328111505b26dee73d12f4b1f071fe18845bfa7f49aec3ea657fc2f4f7f9537d",
+    "scoring_protocol_sha256": "a9715f7d61a12fe7cff5e8a25821316be18dc825930fb05be2d5219f4e1dd87a"
+  },
+  "measurement_sha256": "1a94e871acd1a5fedb1e4a97d37a6de002f9f012acbd1cea18b431d74404c5d9",
+  "method": {
+    "name": "endogaussian",
+    "source_commit": "8d12793",
+    "version": "official_code_retrain_iter3000"
+  },
+  "outputs": {
+    "admission.json": "4155c682ec64f0cda6743f92a70d8b53fd7ac22b5e6b536030bc55da008d1e91",
+    "metrics.json": "7447bedb43ea6e58b0d88083bc5fdb7faaf0ea779c127ea2078e1716b471c3c2",
+    "paper_table.csv": "e7d3b8b024a04444b741f35a7f6a6ac8eb05c7a6adb43bd35332516b6f3f0b82"
+  },
+  "prediction_set_sha256": "2f5bf0dbf2bf9f2abb2ee74757fc296c13b1881403a7a3c6eb2f770214ec823d",
+  "profile_id": "endonerf-rgb-v1",
+  "profile_sha256": "37e3dae14f181296b0d795e90865d74e5ea12a352acc5ce1543cd30213643869",
+  "receipt_sha256": "8c2c2194c47f4da537ac587fe28547dad0e92905ce55beea7c4f7c275778a392",
+  "schema_version": 1,
+  "submission_sha256": "e697fba02cab1ff73f1851eb5cf2217b000ae58aecf68d6a6ec927496d287a12"
+}
