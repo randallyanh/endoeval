@@ -53,8 +53,9 @@ not grant an open-source or Creative Commons licence; see
   Short Oral #1 session. Program inclusion establishes presentation context;
   it does not establish journal acceptance or publication.
 - [The frozen revision record](https://github.com/randallyanh/GP4DGS/pull/139)
-  describes a 6-page clean Wiley double-column manuscript. The PDF stored here
-  is the 10-page article-class reading copy, not that original layout.
+  describes a 6-page clean Wiley double-column manuscript. Both the six-page
+  revision and a separate ten-page article-class reading copy are now stored
+  here; the main README links to the six-page revision.
 - The reading-copy build inputs for the abstract, body and bibliography were
   compared byte-for-byte with source commit `cc650da5`; all three match. The
   reading-copy wrapper imports those files and adds its version notice.

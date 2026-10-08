@@ -25,10 +25,15 @@ receipt under this two-scene profile and are not listed.
 
 ## Claim boundary
 
-These receipts certify the scores of the specific rendered artifact sets named
+These receipts bind the recorded scores to the specific rendered artifact sets named
 in each receipt (`prediction_set_sha256`), under one frozen measurement:
 dataset-valid non-tool tissue support with a true-exclusion denominator.
 Scores under this measurement are not comparable to papers' self-reported
 full-frame numbers — making that incomparability explicit, rather than
 blending it, is what this evaluator is for. Per each `admission.json`, no
 capability claim about any method is admitted.
+
+Offline verification checks hashes, profile identity, and consistency of the
+recorded outputs. It does not recompute scores from the original images or
+provide an independently signed certification. The render sets and raw dataset
+are not bundled, so this repository alone cannot reproduce these baseline scores.

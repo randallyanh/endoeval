@@ -38,6 +38,8 @@ publication remain unverified. A separate 10-page reading copy is retained in
 Python 3.13 is the verified baseline.
 
 ```bash
+git clone https://github.com/randallyanh/endoeval.git
+cd endoeval
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.lock
@@ -133,6 +135,8 @@ src/endoeval/receipts.py            offline verification and comparison
 src/endoeval/image_stats.py         RGB/mask → sufficient statistics
 src/endoeval/profiles/              versioned profile and authority
 src/benchmark_integrity/            numerical and claim-admission kernel
+paper/                              revised manuscript, reading copy, provenance
+presentation/                       conference video, captions, provenance
 baselines/                          verified receipts for public baseline render sets
 examples/                           method-independent submission example
 tests/                              three necessary integration boundaries
