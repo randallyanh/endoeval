@@ -1,7 +1,7 @@
 # Licence pending
 
 No public licence or reuse grant is provided by this repository at this stage.
-It is a private research companion containing evaluator code, evaluation records,
+It is a publicly accessible research companion containing evaluator code, evaluation records,
 author manuscripts, and a conference presentation.
 
 The workshop and its double-blind review period have ended. Licence selection
