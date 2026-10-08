@@ -24,8 +24,9 @@ Hua Yan · Paper 8 · Joint AE-CAI | CARE | OR 2.0 | PRiSM Workshop @ MICCAI 202
 - [Official program — Paper 8, Short Oral #1: Endoscopic Reconstruction & Depth](https://workshops.ap-lab.ca/aecai2026/program/)
 - [MICCAI 2026 conference](https://conferences.miccai.org/2026/)
 
-The workshop took place on 27 September 2026 in Strasbourg, France. The PDF
-preserves the available revised manuscript, including its anonymous title page.
+The workshop took place on 27 September 2026 in Strasbourg, France. The linked PDF is a 10-page reading copy of the available revised manuscript,
+including its anonymous title page. The recorded August review package used a
+6-page Wiley double-column manuscript.
 It is a reading copy rebuilt from the revised source, not a certified copy of
 the exact CMT upload or a publisher's version of record. See the
 [version and provenance note](paper/README.md).

@@ -33,3 +33,23 @@ Scene Reconstruction”; that superseded manuscript is not the PDF linked here.
 The manuscript and code retain their respective rights. Adding this PDF does
 not grant an open-source or Creative Commons licence; see
 [the current licence status](../LICENSE_PENDING.md).
+
+## Follow-up verification (8 October 2026)
+
+- The official workshop program confirms the current title, CMT Paper 8, and
+  Short Oral #1 session. Program inclusion establishes presentation context;
+  it does not establish journal acceptance or publication.
+- [The frozen revision record](https://github.com/randallyanh/GP4DGS/pull/139)
+  describes a 6-page clean Wiley double-column manuscript. The PDF stored here
+  is the 10-page article-class reading copy, not that original layout.
+- The reading-copy build inputs for the abstract, body and bibliography were
+  compared byte-for-byte with source commit `cc650da5`; all three match. The
+  reading-copy wrapper imports those files and adds its version notice.
+- The PDF bytes remain unchanged from the existing reading-copy artifact.
+  This verification does not certify the final CMT-uploaded bytes, or rule out
+  a later revision. Direct CMT download remains unverified because the
+  available browser session requires login.
+
+The current repository therefore supplies an identified revised-source reading
+copy. A verified final workshop upload should replace it only after the actual
+CMT file is retrieved and checked. See [the source verification record](verification.json).

@@ -1,0 +1,29 @@
+{
+  "verified_on": "2026-10-08",
+  "source_repository": "https://github.com/randallyanh/GP4DGS",
+  "source_revision": "cc650da5ef50f8c4ded895b88fa36a1bb9481bcc",
+  "source_files": [
+    {
+      "path": "paper/protocol_audit/latex/abstract.tex",
+      "sha256": "bf1d1d0cb1f2786d5688aac5b4e02d64ea2c2b8c2bbd5946d36ed368b01e1454",
+      "reading_copy_input_matches_revision": true
+    },
+    {
+      "path": "paper/protocol_audit/latex/body.tex",
+      "sha256": "8adf2e36b409b05a3acdb1eef47544ea53043dda42f27beaa941254b7001d91d",
+      "reading_copy_input_matches_revision": true
+    },
+    {
+      "path": "paper/protocol_audit/latex/references.bib",
+      "sha256": "9566baa06ab67e8aa33942db7cce8e409ebca3d347e671360f805a2565c2d0a2",
+      "reading_copy_input_matches_revision": true
+    }
+  ],
+  "pdf_sha256": "5d5c49e5c6eb54b3cefda3d9028ed58e2d7a7192b98255c65f80e43dd7a35ac5",
+  "reading_copy_pages": 10,
+  "recorded_wiley_clean_pages": 6,
+  "revision_record": "https://github.com/randallyanh/GP4DGS/pull/139",
+  "official_program": "https://workshops.ap-lab.ca/aecai2026/program/",
+  "cmt_uploaded_byte_identity": "unverified; available browser session requires login",
+  "journal_acceptance_or_publication": "not established by this verification"
+}
