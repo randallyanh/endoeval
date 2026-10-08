@@ -11,7 +11,24 @@ render predictions
 → receive metrics, a paper table, a receipt, and a claim boundary
 ```
 
-It is pre-release work accompanying a paper submission. It is not yet an open-source release, an official challenge evaluator, or a community standard. Adoption as a field default is tracked separately from the quality and completeness of this implementation.
+It is pre-release work accompanying the workshop paper linked below. It is not yet an open-source release, an official challenge evaluator, or a community standard. Adoption as a field default is tracked separately from the quality and completeness of this implementation.
+
+## Paper and MICCAI 2026 workshop
+
+**When Do Reproducible Scores Support a Valid Comparison in Dynamic Endoscopic Reconstruction?**
+
+Hua Yan · Paper 8 · Joint AE-CAI | CARE | OR 2.0 | PRiSM Workshop @ MICCAI 2026
+
+- [Read the paper (PDF; available revised-source reading copy)](paper/when-do-reproducible-scores-support-a-valid-comparison.pdf)
+- [Workshop homepage](https://workshops.ap-lab.ca/aecai2026/)
+- [Official program — Paper 8, Short Oral #1: Endoscopic Reconstruction & Depth](https://workshops.ap-lab.ca/aecai2026/program/)
+- [MICCAI 2026 conference](https://conferences.miccai.org/2026/)
+
+The workshop took place on 27 September 2026 in Strasbourg, France. The PDF
+preserves the available revised manuscript, including its anonymous title page.
+It is a reading copy rebuilt from the revised source, not a certified copy of
+the exact CMT upload or a publisher's version of record. See the
+[version and provenance note](paper/README.md).
 
 ## Install
 
