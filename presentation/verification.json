@@ -1,0 +1,31 @@
+{
+  "verified_on": "2026-10-08",
+  "video": {
+    "file": "paper8_video_final.mp4",
+    "sha256": "7d2ccabf8f9941215d371e740e6b6e3e2ae1981aa87187a8648317d55002ee81",
+    "size_bytes": 9073696,
+    "duration_seconds": 201.3,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "codecs": [
+      "h264",
+      "aac"
+    ],
+    "source_production_record_hash_matches": true
+  },
+  "captions": {
+    "file": "paper8_video_final.srt",
+    "sha256": "87d691b9190f50823cd78c8fd99051f6b0469fa0e72ffccd9a8c88315632bab8"
+  },
+  "sent_attachment": {
+    "date": "2026-09-16",
+    "filename": "Paper8_HuaYan.mp4",
+    "size_bytes": 9073696,
+    "byte_identity": "not directly verified; production record and sent metadata agree"
+  },
+  "manuscript": {
+    "file": "../paper/paper8-revised-manuscript-clean.pdf",
+    "sha256": "276db2c8341310a2cf129fe7f9507be503db0482f7e39d56e9cb5d351f091ac1"
+  }
+}

@@ -25,5 +25,12 @@
   "revision_record": "https://github.com/randallyanh/GP4DGS/pull/139",
   "official_program": "https://workshops.ap-lab.ca/aecai2026/program/",
   "cmt_uploaded_byte_identity": "unverified; available browser session requires login",
-  "journal_acceptance_or_publication": "not established by this verification"
+  "journal_acceptance_or_publication": "not established by this verification",
+  "primary_manuscript": {
+    "file": "paper8-revised-manuscript-clean.pdf",
+    "pages": 6,
+    "sha256": "276db2c8341310a2cf129fe7f9507be503db0482f7e39d56e9cb5d351f091ac1",
+    "identity": "matches manuscript hash in final conference video production record",
+    "cmt_uploaded_byte_identity": "unverified"
+  }
 }

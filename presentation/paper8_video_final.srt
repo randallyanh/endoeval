@@ -1,0 +1,181 @@
+1
+00:00:00,800 --> 00:00:02,400
+Hello, I'm Hua Yan.
+
+2
+00:00:02,833 --> 00:00:07,600
+I'm sorry I cannot join you in Strasbourg in
+person, so this is a recorded presentation.
+
+3
+00:00:08,500 --> 00:00:15,033
+In dynamic endoscopic reconstruction, performance tables help
+us choose baselines and decide what to investigate next,
+
+4
+00:00:15,033 --> 00:00:17,767
+before anything reaches clinical evaluation.
+
+5
+00:00:18,967 --> 00:00:23,433
+But two results labelled masked PSNR may score different pixels.
+
+6
+00:00:24,267 --> 00:00:27,100
+Reproducing each number does not resolve that difference.
+
+7
+00:00:28,000 --> 00:00:32,133
+Our paper asks when the available evidence
+supports the intended comparison.
+
+8
+00:00:33,033 --> 00:00:35,867
+We first tested this question on our own archived results.
+
+9
+00:00:38,133 --> 00:00:40,767
+We asked three questions of seven archived results.
+
+10
+00:00:41,367 --> 00:00:44,033
+Reproduce: could we regenerate the scores?
+
+11
+00:00:44,767 --> 00:00:48,967
+Five rows replayed, with all twenty tested
+cells matching the recorded values.
+
+12
+00:00:49,433 --> 00:00:53,567
+Trace: could we identify the outputs
+and their exact source record?
+
+13
+00:00:54,367 --> 00:00:58,767
+Four replayable rows were bound to
+an exact source record; one was not.
+
+14
+00:00:59,533 --> 00:01:04,667
+Compare: did the original scores support a
+comparison of the two source-bound output sets?
+
+15
+00:01:05,133 --> 00:01:10,933
+Their evaluation regions differed: the scores
+replayed exactly, yet they were not yet comparable.
+
+16
+00:01:11,767 --> 00:01:15,133
+The next step was to rescore the
+saved outputs on a shared region.
+
+17
+00:01:17,467 --> 00:01:22,400
+We kept the EndoGaussian and SurgicalGaussian
+outputs fixed and changed the scoring region.
+
+18
+00:01:22,867 --> 00:01:29,900
+On the common dataset-defined region, SurgicalGaussian's
+outputs scored higher by about one point two seven decibels.
+
+19
+00:01:30,333 --> 00:01:35,767
+A further restriction to valid tissue reduced that
+advantage to about zero point four five decibels.
+
+20
+00:01:36,267 --> 00:01:40,933
+The aggregate direction stayed the same, but
+the two scenes favoured different outputs.
+
+21
+00:01:41,267 --> 00:01:45,933
+This is a comparison of two saved output
+sets under one specified measurement.
+
+22
+00:01:46,333 --> 00:01:50,767
+Comparing the methods themselves would also
+need matched training and production evidence.
+
+23
+00:01:51,467 --> 00:01:54,633
+This repair depended on having the outputs and scoring details.
+
+24
+00:01:57,333 --> 00:02:01,000
+How much of that evidence could we recover
+from publications and released source?
+
+25
+00:02:01,733 --> 00:02:06,800
+We examined twenty-seven results from eight
+papers within a predefined sixteen-paper corpus.
+
+26
+00:02:07,233 --> 00:02:10,067
+The metric family was identifiable for every result.
+
+27
+00:02:10,500 --> 00:02:15,000
+Yet the actual rule selecting evaluation
+frames was fully specified for none.
+
+28
+00:02:15,700 --> 00:02:19,633
+Useful components were available, but key
+measurement details remained unresolved.
+
+29
+00:02:20,567 --> 00:02:28,133
+Until those details are supplied, a cross-paper comparison
+stays open; the gaps do not show that any score is wrong.
+
+30
+00:02:31,000 --> 00:02:36,633
+Together, these studies show that before acting on a
+result, we should first know what that result supports:
+
+31
+00:02:37,067 --> 00:02:43,967
+compare saved outputs under a shared measurement, rescore
+a repairable mismatch, or seek missing information.
+
+32
+00:02:44,800 --> 00:02:48,467
+I already use agents for algorithm and engineering development.
+
+33
+00:02:49,067 --> 00:02:53,567
+My long-term goal is to build research
+agents that propose algorithmic changes,
+
+34
+00:02:53,867 --> 00:03:00,867
+implement and run experiments, evaluate the results, and
+choose the next experiment using verifiable evidence.
+
+35
+00:03:01,767 --> 00:03:06,067
+A next study could test whether these checks
+improve those decisions under human supervision,
+
+36
+00:03:06,367 --> 00:03:08,433
+including when to request human review.
+
+37
+00:03:09,067 --> 00:03:13,667
+So when two scores share a metric name, ask
+first whether they scored the same pixels.
+
+38
+00:03:14,533 --> 00:03:16,200
+Questions are welcome by email.
+
+39
+00:03:16,633 --> 00:03:17,633
+Thank you.

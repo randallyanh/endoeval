@@ -6,11 +6,24 @@ Author: Hua Yan. Workshop: Joint AE-CAI | CARE | OR 2.0 | PRiSM Workshop @
 MICCAI 2026, 27 September 2026, Strasbourg, France. The official program lists
 this title as Paper 8 in Short Oral #1: Endoscopic Reconstruction & Depth.
 
-- [Paper PDF](when-do-reproducible-scores-support-a-valid-comparison.pdf)
+- [Revised manuscript (6-page Wiley PDF)](paper8-revised-manuscript-clean.pdf)
+- [Reading copy (10-page PDF)](when-do-reproducible-scores-support-a-valid-comparison.pdf)
+- [Conference presentation](../presentation/README.md)
 - [Workshop homepage](https://workshops.ap-lab.ca/aecai2026/)
 - [Official program](https://workshops.ap-lab.ca/aecai2026/program/)
 
-## Version
+## Primary manuscript: six-page Wiley revision
+
+The six-page clean revised manuscript was located through the conference
+presentation production record. Its SHA-256 is
+`276db2c8341310a2cf129fe7f9507be503db0482f7e39d56e9cb5d351f091ac1`,
+which matches the manuscript identity recorded when the final video was made.
+It has the current workshop title and retains the anonymous author line.
+The original PDF is copied without modification. It is the manuscript used
+for presentation preparation, not a newly typeset reconstruction. Exact final
+CMT-upload byte identity and journal publication remain unverified.
+
+## Secondary version: ten-page reading copy
 
 This is the existing 10-page available-source reading copy, rebuilt on
 27 September 2026 from revised manuscript source commit
@@ -50,6 +63,7 @@ not grant an open-source or Creative Commons licence; see
   a later revision. Direct CMT download remains unverified because the
   available browser session requires login.
 
-The current repository therefore supplies an identified revised-source reading
-copy. A verified final workshop upload should replace it only after the actual
-CMT file is retrieved and checked. See [the source verification record](verification.json).
+The initial check located only the reading copy. The later video-source check
+located the six-page clean revision described above and promoted it to the main
+README link. This corrects the earlier incomplete search; the reading-copy
+checks remain valid. See [the source verification record](verification.json).

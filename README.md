@@ -19,17 +19,19 @@ It is pre-release work accompanying the workshop paper linked below. It is not y
 
 Hua Yan · Paper 8 · Joint AE-CAI | CARE | OR 2.0 | PRiSM Workshop @ MICCAI 2026
 
-- [Read the paper (PDF; available revised-source reading copy)](paper/when-do-reproducible-scores-support-a-valid-comparison.pdf)
+- [Read the revised manuscript (6-page Wiley PDF)](paper/paper8-revised-manuscript-clean.pdf)
+- [Watch the conference presentation (MP4, 3:21)](presentation/paper8_video_final.mp4)
+- [English captions (SRT)](presentation/paper8_video_final.srt)
 - [Workshop homepage](https://workshops.ap-lab.ca/aecai2026/)
 - [Official program — Paper 8, Short Oral #1: Endoscopic Reconstruction & Depth](https://workshops.ap-lab.ca/aecai2026/program/)
 - [MICCAI 2026 conference](https://conferences.miccai.org/2026/)
 
-The workshop took place on 27 September 2026 in Strasbourg, France. The linked PDF is a 10-page reading copy of the available revised manuscript,
-including its anonymous title page. The recorded August review package used a
-6-page Wiley double-column manuscript.
-It is a reading copy rebuilt from the revised source, not a certified copy of
-the exact CMT upload or a publisher's version of record. See the
-[version and provenance note](paper/README.md).
+The workshop took place on 27 September 2026 in Strasbourg, France. The
+6-page revised manuscript is the source used for the conference presentation.
+It preserves the anonymous review title page. Its identity matches the existing
+presentation production record; final CMT-upload byte identity and journal
+publication remain unverified. A separate 10-page reading copy is retained in
+[the version and provenance note](paper/README.md).
 
 ## Install
 
